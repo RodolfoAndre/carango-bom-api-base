@@ -20,25 +20,25 @@ import java.util.Optional;
 @Controller
 public class MarcaController {
 
-    private MarcaRepository mr;
+    private MarcaRepository marcaRepository;
 
     @Autowired
-    public MarcaController(MarcaRepository mr) {
-        this.mr = mr;
+    public MarcaController(MarcaRepository marcaRepository) {
+        this.marcaRepository = marcaRepository;
     }
 
     @GetMapping("/marcas")
     @ResponseBody
     @Transactional
     public List<Marca> lista() {
-        return mr.findAllByOrderByNome();
+        return marcaRepository.findAllByOrderByNome();
     }
 
     @GetMapping("/marcas/{id}")
     @ResponseBody
     @Transactional
     public ResponseEntity<Marca> id(@PathVariable Long id) {
-        Optional<Marca> m1 = mr.findById(id);
+        Optional<Marca> m1 = marcaRepository.findById(id);
         if (m1.isPresent()) {
             return ResponseEntity.ok(m1.get());
         } else {
@@ -50,7 +50,7 @@ public class MarcaController {
     @ResponseBody
     @Transactional
     public ResponseEntity<Marca> cadastra(@Valid @RequestBody Marca m1, UriComponentsBuilder uriBuilder) {
-        Marca m2 = mr.save(m1);
+        Marca m2 = marcaRepository.save(m1);
         URI h = uriBuilder.path("/marcas/{id}").buildAndExpand(m1.getId()).toUri();
         return ResponseEntity.created(h).body(m2);
     }
@@ -59,7 +59,7 @@ public class MarcaController {
     @ResponseBody
     @Transactional
     public ResponseEntity<Marca> altera(@PathVariable Long id, @Valid @RequestBody Marca m1) {
-        Optional<Marca> m2 = mr.findById(id);
+        Optional<Marca> m2 = marcaRepository.findById(id);
         if (m2.isPresent()) {
             Marca m3 = m2.get();
             m3.setNome(m1.getNome());
@@ -73,10 +73,10 @@ public class MarcaController {
     @ResponseBody
     @Transactional
     public ResponseEntity<Marca> deleta(@PathVariable Long id) {
-        Optional<Marca> m1 = mr.findById(id);
+        Optional<Marca> m1 = marcaRepository.findById(id);
         if (m1.isPresent()) {
             Marca m2 = m1.get();
-            mr.delete(m2);
+            marcaRepository.delete(m2);
             return ResponseEntity.ok(m2);
         } else {
             return ResponseEntity.notFound().build();

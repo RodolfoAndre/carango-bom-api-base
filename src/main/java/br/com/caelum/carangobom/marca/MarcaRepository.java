@@ -10,28 +10,28 @@ import java.util.Optional;
 @Repository
 public class MarcaRepository {
 
-    private EntityManager em;
+    private EntityManager entityManager;
 
     @Autowired
-    public MarcaRepository(EntityManager em) {
-        this.em = em;
+    public MarcaRepository(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
     public void delete(Marca marca) {
-        em.remove(marca);
+        entityManager.remove(marca);
     }
 
     public Marca save(Marca marca) {
-        em.persist(marca);
+        entityManager.persist(marca);
         return marca;
     }
 
     public Optional<Marca> findById(Long id) {
-        return Optional.ofNullable(em.find(Marca.class, id));
+        return Optional.ofNullable(entityManager.find(Marca.class, id));
     }
 
     public List<Marca> findAllByOrderByNome() {
-        return em.createQuery("select m from Marca m order by m.nome", Marca.class)
+        return entityManager.createQuery("select m from Marca m order by m.nome", Marca.class)
                 .getResultList();
     }
 
