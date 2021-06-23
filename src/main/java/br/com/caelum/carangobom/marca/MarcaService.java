@@ -1,5 +1,6 @@
 package br.com.caelum.carangobom.marca;
 
+import br.com.caelum.carangobom.exception.ConflictException;
 import br.com.caelum.carangobom.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,8 +17,9 @@ public class MarcaService {
     private MarcaDtoMapper marcaDtoMapper;
 
     @Autowired
-    public MarcaService(MarcaRepository marcaRepository) {
+    public MarcaService(MarcaRepository marcaRepository, MarcaDtoMapper marcaDtoMapper) {
         this.marcaRepository = marcaRepository;
+        this.marcaDtoMapper = marcaDtoMapper;
     }
 
     @Transactional
@@ -32,13 +34,17 @@ public class MarcaService {
     }
 
     @Transactional
-    public Marca cadastrarMarca(MarcaDto marcaDto) {
-        var marca = marcaDtoMapper.map(marcaDto);
-        return marcaRepository.save(marca);
+    public Marca cadastrarMarca(MarcaDto marcaDto){
+        validaMarcaExistente(marcaDto.getNome());
+
+        var novaMarca = marcaDtoMapper.map(marcaDto);
+        return marcaRepository.save(novaMarca);
     }
 
     @Transactional
     public Marca alterarMarca(Long id, MarcaDto marcaDto) {
+        validaMarcaExistente(marcaDto.getNome());
+
         var marcaEncontrada = obterMarcaPorId(id);
         marcaEncontrada.setNome(marcaDto.getNome());
         return marcaEncontrada;
@@ -49,5 +55,10 @@ public class MarcaService {
         var marcaEncontrada = obterMarcaPorId(id);
         marcaRepository.delete(marcaEncontrada);
         return marcaEncontrada;
+    }
+
+    private void validaMarcaExistente(String nomeMarca) {
+        Optional<Marca> marcaEncontrada = marcaRepository.findByName(nomeMarca);
+        marcaEncontrada.ifPresent((m) ->{ throw new ConflictException("Marca " + m.getNome()+ " já existente");});
     }
 }

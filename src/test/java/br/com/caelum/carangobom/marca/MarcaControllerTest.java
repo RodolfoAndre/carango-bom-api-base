@@ -45,8 +45,10 @@ class MarcaControllerTest {
         when(marcaService.listarMarcas())
             .thenReturn(marcas);
 
-        List<Marca> resultado = marcaController.lista();
-        assertEquals(marcas, resultado);
+        ResponseEntity<List<Marca>> resultado = marcaController.listarMarcas();
+
+        assertEquals(marcas, resultado.getBody());
+        assertEquals(HttpStatus.OK, resultado.getStatusCode());
     }
 
     @Test
@@ -77,7 +79,7 @@ class MarcaControllerTest {
         when(marcaService.cadastrarMarca(novaMarcaDto))
             .thenReturn(new Marca(1L, "Ferrari"));
 
-        ResponseEntity<Marca> resposta = marcaController.cadastra(novaMarcaDto, uriBuilder);
+        ResponseEntity<Marca> resposta = marcaController.cadastrarMarca(novaMarcaDto, uriBuilder);
         assertEquals(HttpStatus.CREATED, resposta.getStatusCode());
         assertEquals("http://localhost:8080/marcas/1", resposta.getHeaders().getLocation().toString());
     }
@@ -127,5 +129,4 @@ class MarcaControllerTest {
         ResponseEntity<Marca> resposta = marcaController.deletarMarca(1L);
         assertEquals(HttpStatus.NOT_FOUND, resposta.getStatusCode());
     }
-
 }

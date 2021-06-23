@@ -37,8 +37,8 @@ public class MarcaController {
 
     @GetMapping("/marcas")
     @ResponseBody
-    public List<Marca> lista() {
-        return marcaService.listarMarcas();
+    public ResponseEntity<List<Marca>> listarMarcas() {
+        return ResponseEntity.ok(marcaService.listarMarcas());
     }
 
     @GetMapping("/marcas/{id}")
@@ -53,7 +53,7 @@ public class MarcaController {
 
     @PostMapping("/marcas")
     @ResponseBody
-    public ResponseEntity<Marca> cadastra(@Valid @RequestBody MarcaDto marcaDto, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<Marca> cadastrarMarca(@Valid @RequestBody MarcaDto marcaDto, UriComponentsBuilder uriBuilder) {
         try {
             var marcaSalva = marcaService.cadastrarMarca(marcaDto);
             var uri = uriBuilder.path("/marcas/{id}").buildAndExpand(marcaSalva.getId()).toUri();
@@ -82,21 +82,5 @@ public class MarcaController {
         } catch (NotFoundException notFoundException) {
             return ResponseEntity.notFound().build();
         }
-    }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseBody
-    public ListaDeErrosOutputDto validacao(MethodArgumentNotValidException excecao) {
-        List<ErroDeParametroOutputDto> listaDeErro = new ArrayList<>();
-        excecao.getBindingResult().getFieldErrors().forEach(e -> {
-            var erroDeParametro = new ErroDeParametroOutputDto();
-            erroDeParametro.setParametro(e.getField());
-            erroDeParametro.setMensagem(e.getDefaultMessage());
-            listaDeErro.add(erroDeParametro);
-        });
-        var listaDeErrosOutput = new ListaDeErrosOutputDto();
-        listaDeErrosOutput.setErros(listaDeErro);
-        return listaDeErrosOutput;
     }
 }

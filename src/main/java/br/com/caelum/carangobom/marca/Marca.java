@@ -14,8 +14,6 @@ public class Marca {
     @Id @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Size(min = 2, message = "Deve ter {min} ou mais caracteres.")
     private String nome;
 
     public Marca() {
