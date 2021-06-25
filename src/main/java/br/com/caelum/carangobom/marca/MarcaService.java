@@ -58,7 +58,7 @@ public class MarcaService {
     }
 
     private void validaMarcaExistente(String nomeMarca) {
-        Optional<Marca> marcaEncontrada = marcaRepository.findByName(nomeMarca);
+        Optional<Marca> marcaEncontrada = marcaRepository.findByNome(nomeMarca);
         marcaEncontrada.ifPresent((m) ->{ throw new ConflictException("Marca " + m.getNome()+ " já existente");});
     }
 }

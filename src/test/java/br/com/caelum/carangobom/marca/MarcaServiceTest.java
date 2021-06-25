@@ -5,7 +5,6 @@ import br.com.caelum.carangobom.exception.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,7 +102,7 @@ class MarcaServiceTest {
                 new Marca(1L, "Audi")
         );
 
-        when(marcaRepository.findByName(marca.getNome()))
+        when(marcaRepository.findByNome(marca.getNome()))
                 .thenReturn(marcaCadastrada);
 
         Exception exception = assertThrows(ConflictException.class, () -> {
@@ -121,7 +120,7 @@ class MarcaServiceTest {
         MarcaDto marca = new MarcaDto(null, "Audi");
         Marca novaMarca = new Marca(1L, "Audi");
 
-        when(marcaRepository.findByName(marca.getNome()))
+        when(marcaRepository.findByNome(marca.getNome()))
                 .thenReturn(Optional.empty());
 
         when(marcaRepository.save(any(Marca.class)))
@@ -140,7 +139,7 @@ class MarcaServiceTest {
                 new Marca(3L, "Audi")
         );
 
-        when(marcaRepository.findByName(marca.getNome()))
+        when(marcaRepository.findByNome(marca.getNome()))
                 .thenReturn(marcaCadastrada);
 
         Exception exception = assertThrows(ConflictException.class, () -> {
@@ -181,7 +180,7 @@ class MarcaServiceTest {
         when(marcaRepository.findById(1L))
                 .thenReturn(marcas);
 
-        when(marcaRepository.findByName(marca.getNome()))
+        when(marcaRepository.findByNome(marca.getNome()))
                 .thenReturn(Optional.empty());
 
         var marcaAlterada = marcaService.alterarMarca(1L, marca);
