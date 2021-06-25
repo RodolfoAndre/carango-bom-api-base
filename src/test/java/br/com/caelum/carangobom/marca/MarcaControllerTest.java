@@ -122,7 +122,7 @@ class MarcaControllerTest {
     }
 
     @Test
-    void naoDeveDeletarMarcaInexistente() {
+    void deveDarErroAoTentarDeletarMarcaInexistente() {
         when(marcaService.deletarMarca(anyLong()))
                 .thenThrow(new NotFoundException("Marca não encontrada"));
 

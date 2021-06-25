@@ -63,7 +63,7 @@ class MarcaServiceTest {
     }
 
     @Test
-    void deveRetornanrMarcaPorIdCorretamente() {
+    void deveRetornarMarcaPorIdCorretamente() {
         Optional<Marca> marcas = Optional.of(
                 new Marca(1L, "Audi")
         );
@@ -132,7 +132,7 @@ class MarcaServiceTest {
     }
 
     @Test
-    void deveRetornarExcecaoCasoMarcaJaEstiverCadastradaAoTentarEditar() {
+    void deveRetornarExcecaoCasoExistaMarcaComMesmoNomeAoTentarEditar() {
         MarcaDto marca = new MarcaDto(1L, "Audi");
 
         Optional<Marca> marcaCadastrada = Optional.of(

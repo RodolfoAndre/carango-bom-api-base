@@ -35,7 +35,7 @@ public class MarcaService {
 
     @Transactional
     public Marca cadastrarMarca(MarcaDto marcaDto){
-        validaMarcaExistente(marcaDto.getNome());
+        validarMarcaExistente(marcaDto.getNome());
 
         var novaMarca = marcaDtoMapper.map(marcaDto);
         return marcaRepository.save(novaMarca);
@@ -43,7 +43,7 @@ public class MarcaService {
 
     @Transactional
     public Marca alterarMarca(Long id, MarcaDto marcaDto) {
-        validaMarcaExistente(marcaDto.getNome());
+        validarMarcaExistente(marcaDto.getNome());
 
         var marcaEncontrada = obterMarcaPorId(id);
         marcaEncontrada.setNome(marcaDto.getNome());
@@ -57,7 +57,7 @@ public class MarcaService {
         return marcaEncontrada;
     }
 
-    private void validaMarcaExistente(String nomeMarca) {
+    private void validarMarcaExistente(String nomeMarca) {
         Optional<Marca> marcaEncontrada = marcaRepository.findByNome(nomeMarca);
         marcaEncontrada.ifPresent((m) ->{ throw new ConflictException("Marca " + m.getNome()+ " já existente");});
     }
