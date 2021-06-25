@@ -1,38 +1,13 @@
 package br.com.caelum.carangobom.marca;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
-public class MarcaRepository {
+public interface MarcaRepository extends JpaRepository<Marca, Long> {
 
-    private EntityManager em;
+    Optional<Marca> findByNome(String nomeMarca);
 
-    @Autowired
-    public MarcaRepository(EntityManager em) {
-        this.em = em;
-    }
-
-    public void delete(Marca marca) {
-        em.remove(marca);
-    }
-
-    public Marca save(Marca marca) {
-        em.persist(marca);
-        return marca;
-    }
-
-    public Optional<Marca> findById(Long id) {
-        return Optional.ofNullable(em.find(Marca.class, id));
-    }
-
-    public List<Marca> findAllByOrderByNome() {
-        return em.createQuery("select m from Marca m order by m.nome", Marca.class)
-                .getResultList();
-    }
-
+    List<Marca> findAllByOrderByNome();
 }
