@@ -36,16 +36,16 @@ class MarcaControllerTest {
 
     @Test
     void deveRetornarListaQuandoHouverResultados() {
-        List<Marca> marcas = List.of(
-            new Marca(1L, "Audi"),
-            new Marca(2L, "BMW"),
-            new Marca(3L, "Fiat")
+        List<MarcaDto> marcas = List.of(
+            new MarcaDto(1L, "Audi"),
+            new MarcaDto(2L, "BMW"),
+            new MarcaDto(3L, "Fiat")
         );
 
         when(marcaService.listarMarcas())
             .thenReturn(marcas);
 
-        ResponseEntity<List<Marca>> resultado = marcaController.listarMarcas();
+        ResponseEntity<List<MarcaDto>> resultado = marcaController.listarMarcas();
 
         assertEquals(marcas, resultado.getBody());
         assertEquals(HttpStatus.OK, resultado.getStatusCode());
@@ -53,12 +53,12 @@ class MarcaControllerTest {
 
     @Test
     void deveRetornarMarcaPeloId() {
-        Marca audi = new Marca(1L, "Audi");
+        MarcaDto audi = new MarcaDto(1L, "Audi");
 
         when(marcaService.obterMarcaPorId(1L))
             .thenReturn(audi);
 
-        ResponseEntity<Marca> resposta = marcaController.obterMarcarPorId(1L);
+        ResponseEntity<MarcaDto> resposta = marcaController.obterMarcaPorId(1L);
         assertEquals(audi, resposta.getBody());
         assertEquals(HttpStatus.OK, resposta.getStatusCode());
     }
@@ -68,7 +68,7 @@ class MarcaControllerTest {
         when(marcaService.obterMarcaPorId(anyLong()))
                 .thenThrow(new NotFoundException("Marca não encontrada"));
 
-        ResponseEntity<Marca> resposta = marcaController.obterMarcarPorId(1L);
+        ResponseEntity<MarcaDto> resposta = marcaController.obterMarcaPorId(1L);
         assertEquals(HttpStatus.NOT_FOUND, resposta.getStatusCode());
     }
 
@@ -77,9 +77,9 @@ class MarcaControllerTest {
         MarcaDto novaMarcaDto = new MarcaDto(null, "Ferrari");
 
         when(marcaService.cadastrarMarca(novaMarcaDto))
-            .thenReturn(new Marca(1L, "Ferrari"));
+            .thenReturn(new MarcaDto(1L, "Ferrari"));
 
-        ResponseEntity<Marca> resposta = marcaController.cadastrarMarca(novaMarcaDto, uriBuilder);
+        ResponseEntity<MarcaDto> resposta = marcaController.cadastrarMarca(novaMarcaDto, uriBuilder);
         assertEquals(HttpStatus.CREATED, resposta.getStatusCode());
         assertEquals("http://localhost:8080/marcas/1", resposta.getHeaders().getLocation().toString());
     }
@@ -87,15 +87,15 @@ class MarcaControllerTest {
     @Test
     void deveAlterarNomeQuandoMarcaExistir() {
         MarcaDto novaAudiDto = new MarcaDto(1L, "NOVA Audi");
-        Marca novaAudi = new Marca(1L, "NOVA Audi");
+        MarcaDto novaAudi = new MarcaDto(1L, "NOVA Audi");
 
         when(marcaService.alterarMarca(1L, novaAudiDto))
             .thenReturn(novaAudi);
 
-        ResponseEntity<Marca> resposta = marcaController.alterarMarca(1L, novaAudiDto);
+        ResponseEntity<MarcaDto> resposta = marcaController.alterarMarca(1L, novaAudiDto);
         assertEquals(HttpStatus.OK, resposta.getStatusCode());
 
-        Marca marcaAlterada = resposta.getBody();
+        MarcaDto marcaAlterada = resposta.getBody();
         assertNotNull(marcaAlterada);
         assertEquals("NOVA Audi", marcaAlterada.getNome());
     }
@@ -105,18 +105,18 @@ class MarcaControllerTest {
         when(marcaService.alterarMarca(anyLong(), any(MarcaDto.class)))
                 .thenThrow(new NotFoundException("Marca não encontrada"));
 
-        ResponseEntity<Marca> resposta = marcaController.alterarMarca(1L, new MarcaDto(1L, "NOVA Audi"));
+        ResponseEntity<MarcaDto> resposta = marcaController.alterarMarca(1L, new MarcaDto(1L, "NOVA Audi"));
         assertEquals(HttpStatus.NOT_FOUND, resposta.getStatusCode());
     }
 
     @Test
     void deveDeletarMarcaExistente() {
-        Marca audi = new Marca(1l, "Audi");
+        MarcaDto audi = new MarcaDto(1L, "Audi");
 
         when(marcaService.obterMarcaPorId(1L))
             .thenReturn(audi);
 
-        ResponseEntity<Marca> resposta = marcaController.deletarMarca(1L);
+        ResponseEntity<MarcaDto> resposta = marcaController.deletarMarca(1L);
         assertEquals(HttpStatus.OK, resposta.getStatusCode());
         verify(marcaService).deletarMarca(audi.getId());
     }
@@ -126,7 +126,7 @@ class MarcaControllerTest {
         when(marcaService.deletarMarca(anyLong()))
                 .thenThrow(new NotFoundException("Marca não encontrada"));
 
-        ResponseEntity<Marca> resposta = marcaController.deletarMarca(1L);
+        ResponseEntity<MarcaDto> resposta = marcaController.deletarMarca(1L);
         assertEquals(HttpStatus.NOT_FOUND, resposta.getStatusCode());
     }
 }
