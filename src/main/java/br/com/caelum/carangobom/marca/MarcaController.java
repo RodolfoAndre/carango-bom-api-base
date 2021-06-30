@@ -5,7 +5,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
@@ -14,6 +22,7 @@ import java.util.List;
 /**
  * Classe reponsável pelo controller de marca.
  */
+@CrossOrigin
 @Controller
 public class MarcaController extends GenericController {
 
@@ -35,7 +44,6 @@ public class MarcaController extends GenericController {
      * @return {@link ResponseEntity} com o resultado da requisição. Caso ocorra tudo como esperado, deverá retornar
      * com "status code" 200 e as marcas disponíveis em seu "body"
      */
-    @CrossOrigin
     @GetMapping("/marcas")
     @ResponseBody
     public ResponseEntity<List<MarcaDto>> listarMarcas() {
@@ -49,7 +57,6 @@ public class MarcaController extends GenericController {
      * @return {@link ResponseEntity} com o resultado da requisição. Caso ocorra tudo como esperado, deverá retornar
      * com "status code" 200 (ok) e as marcas disponíveis em seu "body", caso não seja, retornará "status code" 404 (not found).
      */
-    @CrossOrigin
     @GetMapping("/marcas/{id}")
     @ResponseBody
     public ResponseEntity<MarcaDto> obterMarcaPorId(@PathVariable Long id) {
@@ -64,7 +71,6 @@ public class MarcaController extends GenericController {
      * @return {@link ResponseEntity} com o resultado da requisição. Caso ocorra tudo como esperado, deverá retornar
      * com "status code" 200 (ok), caso não seja, retornará "status code" 404 (not found).
      */
-    @CrossOrigin
     @PostMapping("/marcas")
     @ResponseBody
     public ResponseEntity<MarcaDto> cadastrarMarca(@Valid @RequestBody MarcaDto marcaDto, UriComponentsBuilder uriBuilder) {
@@ -79,7 +85,6 @@ public class MarcaController extends GenericController {
      * @return {@link ResponseEntity} com o resultado da requisição. Caso ocorra tudo como esperado, deverá retornar
      * com "status code" 200 (ok), caso não seja, retornará "status code" 404 (not found).
      */
-    @CrossOrigin
     @PutMapping("/marcas/{id}")
     @ResponseBody
     public ResponseEntity<MarcaDto> alterarMarca(@PathVariable Long id, @Valid @RequestBody MarcaDto marcaDto) {
@@ -93,7 +98,6 @@ public class MarcaController extends GenericController {
      * @return {@link ResponseEntity} com o resultado da requisição. Caso ocorra tudo como esperado, deverá retornar
      * com "status code" 200 (ok), caso não seja, retornará "status code" 404 (not found).
      */
-    @CrossOrigin
     @DeleteMapping("/marcas/{id}")
     @ResponseBody
     @Transactional
