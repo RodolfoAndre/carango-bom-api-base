@@ -214,9 +214,9 @@ class MarcaServiceTest {
         when(marcaRepository.findById(1L))
                 .thenReturn(marcas);
 
-        var marcaAlterada = marcaService.deletarMarca(1L);
+        var marcaDeletada = marcaService.deletarMarca(1L);
 
-        assertEquals(marcas.get().getNome(), marcaAlterada.getNome());
+        assertEquals(marcas.get().getNome(), marcaDeletada.getNome());
     }
 
 }
