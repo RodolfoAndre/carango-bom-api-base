@@ -1,34 +1,53 @@
 package br.com.caelum.carangobom.marca;
 
+import br.com.caelum.carangobom.shared.BasicEntityDto;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.Objects;
 
-public class MarcaDto {
-
-    private Long id;
+/**
+ * Objeto de transferência de dado usado para marca
+ */
+@Getter
+@Setter
+@AllArgsConstructor
+public class MarcaDto extends BasicEntityDto {
 
     @NotBlank
     @Size(min = 2, message = "Deve ter {min} ou mais caracteres.")
     private String nome;
 
     public MarcaDto(Long id, String nome) {
-        this.id = id;
+        super.id = id;
         this.nome = nome;
     }
 
-    public Long getId() {
-        return id;
+    @Override
+    public boolean equals(Object that) {
+        if (this == that) {
+            return true;
+        }
+        if (that == null || getClass() != that.getClass()) {
+            return false;
+        }
+        MarcaDto marcaDto = (MarcaDto) that;
+        return Objects.equals(nome, marcaDto.nome);
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    @Override
+    public int hashCode() {
+        return Objects.hash(nome);
     }
 
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
+    @Override
+    public String toString() {
+        return "MarcaDto{" +
+                "nome='" + nome + '\'' +
+                ", id=" + id +
+                '}';
     }
 }

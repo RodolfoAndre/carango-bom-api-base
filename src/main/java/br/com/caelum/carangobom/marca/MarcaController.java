@@ -1,6 +1,6 @@
 package br.com.caelum.carangobom.marca;
 
-import br.com.caelum.carangobom.exception.NotFoundException;
+import br.com.caelum.carangobom.shared.GenericController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,62 +17,88 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.validation.Valid;
 import java.util.List;
 
+/**
+ * Classe reponsável pelo controller de marca.
+ */
 @Controller
-public class MarcaController {
+public class MarcaController extends GenericController {
 
     private final MarcaService marcaService;
 
+    /**
+     * Construtor da classe Marca Controller
+     *
+     * @param marcaService o serviço de marcas
+     */
     @Autowired
     public MarcaController(MarcaService marcaService) {
         this.marcaService = marcaService;
     }
 
+    /**
+     * Lista todas as marcas registradas pelos usuários
+     *
+     * @return {@link ResponseEntity} com o resultado da requisição. Caso ocorra tudo como esperado, deverá retornar
+     * com "status code" 200 e as marcas disponíveis em seu "body"
+     */
     @GetMapping("/marcas")
     @ResponseBody
-    public ResponseEntity<List<Marca>> listarMarcas() {
-        return ResponseEntity.ok(marcaService.listarMarcas());
+    public ResponseEntity<List<MarcaDto>> listarMarcas() {
+        return encapsulaResultadoOk(marcaService::listarMarcas);
     }
 
+    /**
+     * Obtém marcas por id
+     *
+     * @param id o id da marca a ser obtida
+     * @return {@link ResponseEntity} com o resultado da requisição. Caso ocorra tudo como esperado, deverá retornar
+     * com "status code" 200 (ok) e as marcas disponíveis em seu "body", caso não seja, retornará "status code" 404 (not found).
+     */
     @GetMapping("/marcas/{id}")
     @ResponseBody
-    public ResponseEntity<Marca> obterMarcarPorId(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(marcaService.obterMarcaPorId(id));
-        } catch (NotFoundException notFoundException) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<MarcaDto> obterMarcaPorId(@PathVariable Long id) {
+        return encapsulaResultadoOk(() -> marcaService.obterMarcaPorId(id));
     }
 
+    /**
+     * Cadastra a marca dada
+     *
+     * @param marcaDto os dados da marca a ser cadastrada
+     * @param uriBuilder o construtor de uri para ser enviado como resposta em caso de sucesso
+     * @return {@link ResponseEntity} com o resultado da requisição. Caso ocorra tudo como esperado, deverá retornar
+     * com "status code" 200 (ok), caso não seja, retornará "status code" 404 (not found).
+     */
     @PostMapping("/marcas")
     @ResponseBody
-    public ResponseEntity<Marca> cadastrarMarca(@Valid @RequestBody MarcaDto marcaDto, UriComponentsBuilder uriBuilder) {
-        try {
-            var marcaSalva = marcaService.cadastrarMarca(marcaDto);
-            var uri = uriBuilder.path("/marcas/{id}").buildAndExpand(marcaSalva.getId()).toUri();
-            return ResponseEntity.created(uri).body(marcaSalva);
-        } catch (NotFoundException notFoundException) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<MarcaDto> cadastrarMarca(@Valid @RequestBody MarcaDto marcaDto, UriComponentsBuilder uriBuilder) {
+        return encapsularResultadoCreated(() -> marcaService.cadastrarMarca(marcaDto), uriBuilder, "/marcas/{id}");
     }
 
+    /**
+     * Altera uma marca
+     *
+     * @param id o id da marca a ser alterada
+     * @param marcaDto os novos dados da marca a ser alterada
+     * @return {@link ResponseEntity} com o resultado da requisição. Caso ocorra tudo como esperado, deverá retornar
+     * com "status code" 200 (ok), caso não seja, retornará "status code" 404 (not found).
+     */
     @PutMapping("/marcas/{id}")
     @ResponseBody
-    public ResponseEntity<Marca> alterarMarca(@PathVariable Long id, @Valid @RequestBody MarcaDto marcaDto) {
-        try {
-            return ResponseEntity.ok(marcaService.alterarMarca(id, marcaDto));
-        } catch (NotFoundException notFoundException) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<MarcaDto> alterarMarca(@PathVariable Long id, @Valid @RequestBody MarcaDto marcaDto) {
+        return encapsulaResultadoOk(() -> marcaService.alterarMarca(id, marcaDto));
     }
 
+    /**
+     * Deleta marcas pelo id
+     *
+     * @param id o id da marca a ser deletada
+     * @return {@link ResponseEntity} com o resultado da requisição. Caso ocorra tudo como esperado, deverá retornar
+     * com "status code" 200 (ok), caso não seja, retornará "status code" 404 (not found).
+     */
     @DeleteMapping("/marcas/{id}")
     @ResponseBody
     @Transactional
-    public ResponseEntity<Marca> deletarMarca(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(marcaService.deletarMarca(id));
-        } catch (NotFoundException notFoundException) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<MarcaDto> deletarMarca(@PathVariable Long id) {
+        return encapsulaResultadoOk(() -> marcaService.deletarMarca(id));
     }
 }
