@@ -79,9 +79,9 @@ public class MarcaService {
     public MarcaDto alterarMarca(Long id, MarcaDto marcaDto) {
         validarMarcaExistente(marcaDto.getNome());
 
-        var marcaEncontrada = obterMarcaPorId(id);
+        var marcaEncontrada = marcaDtoMapper.map(obterMarcaPorId(id));
         marcaEncontrada.setNome(marcaDto.getNome());
-        return marcaEncontrada;
+        return marcaDtoMapper.map(marcaRepository.save(marcaEncontrada));
     }
 
     /**
