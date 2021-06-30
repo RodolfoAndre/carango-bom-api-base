@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -17,6 +18,10 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 class MarcaServiceTest {
+
+    public static final String MARCA_FERRARI = "Ferrari";
+    public static final String MARCA_AUDI = "Audi";
+    public static final String MARCA_NAO_ENCONTRADA_MENSAGEM = "Marca não encontrada";
 
     @Mock
     private MarcaRepository marcaRepository;
@@ -36,10 +41,11 @@ class MarcaServiceTest {
     @Test
     void deveListarTodasAsMarcasCorretamente() {
         List<Marca> marcas = List.of(
-                new Marca(1L, "Audi"),
+                new Marca(1L, MARCA_AUDI),
                 new Marca(2L, "BMW"),
                 new Marca(3L, "Fiat")
         );
+        List<MarcaDto> marcasEsperadas = marcas.stream().map(marcaDtoMapper::map).collect(Collectors.toList());
 
         when(marcaRepository.findAllByOrderByNome())
                 .thenReturn(marcas);
@@ -47,12 +53,12 @@ class MarcaServiceTest {
         var marcasRetornadas = marcaService.listarMarcas();
 
         assertNotNull(marcasRetornadas);
-        assertEquals(marcas, marcasRetornadas);
+        assertEquals(marcasEsperadas, marcasRetornadas);
     }
 
     @Test
     void deveRetornarListaVaziaSeNaoEncontrarNenhumaMarca() {
-        List<Marca> marcas = new ArrayList<Marca>();
+        List<MarcaDto> marcas = new ArrayList<>();
 
         doReturn(marcas).when(marcaRepository).findAllByOrderByNome();
 
@@ -64,17 +70,18 @@ class MarcaServiceTest {
 
     @Test
     void deveRetornarMarcaPorIdCorretamente() {
-        Optional<Marca> marcas = Optional.of(
-                new Marca(1L, "Audi")
+        Optional<Marca> marca = Optional.of(
+                new Marca(1L, MARCA_AUDI)
         );
+        var marcaEsperada = marcaDtoMapper.map(marca.get());
 
         when(marcaRepository.findById(1L))
-                .thenReturn(marcas);
+                .thenReturn(marca);
 
         var marcasRetornadas = marcaService.obterMarcaPorId(1L);
 
         assertNotNull(marcasRetornadas);
-        assertEquals(marcas.get(), marcasRetornadas);
+        assertEquals(marcaEsperada, marcasRetornadas);
     }
 
     @Test
@@ -88,18 +95,17 @@ class MarcaServiceTest {
             marcaService.obterMarcaPorId(2L);
         });
 
-        String expectedMessage = "Marca não encontrada";
         String actualMessage = exception.getMessage();
 
-        assertEquals(expectedMessage, actualMessage);
+        assertEquals(MARCA_NAO_ENCONTRADA_MENSAGEM, actualMessage);
     }
 
     @Test
     void deveRetornarExcecaoCasoMarcaJaEstiverCadastradaAoTentarInserir() {
-        MarcaDto marca = new MarcaDto(null, "Audi");
+        MarcaDto marca = new MarcaDto(null, MARCA_AUDI);
 
         Optional<Marca> marcaCadastrada = Optional.of(
-                new Marca(1L, "Audi")
+                new Marca(1L, MARCA_AUDI)
         );
 
         when(marcaRepository.findByNome(marca.getNome()))
@@ -117,8 +123,8 @@ class MarcaServiceTest {
 
     @Test
     void deveRetornarNovaMarcaCadastrada() {
-        MarcaDto marca = new MarcaDto(null, "Audi");
-        Marca novaMarca = new Marca(1L, "Audi");
+        MarcaDto marca = new MarcaDto(null, MARCA_AUDI);
+        Marca novaMarca = new Marca(1L, MARCA_AUDI);
 
         when(marcaRepository.findByNome(marca.getNome()))
                 .thenReturn(Optional.empty());
@@ -133,10 +139,10 @@ class MarcaServiceTest {
 
     @Test
     void deveRetornarExcecaoCasoExistaMarcaComMesmoNomeAoTentarEditar() {
-        MarcaDto marca = new MarcaDto(1L, "Audi");
+        MarcaDto marca = new MarcaDto(1L, MARCA_AUDI);
 
         Optional<Marca> marcaCadastrada = Optional.of(
-                new Marca(3L, "Audi")
+                new Marca(3L, MARCA_AUDI)
         );
 
         when(marcaRepository.findByNome(marca.getNome()))
@@ -155,7 +161,7 @@ class MarcaServiceTest {
     @Test
     void deveRetornarExcecaoNotFoundCasoMarcaPorIdNaoEncontrarMarcaAoEditar() {
         Optional<Marca> marcas = Optional.empty();
-        MarcaDto marca = new MarcaDto(1L, "Ferrari");
+        MarcaDto marca = new MarcaDto(1L, MARCA_FERRARI);
 
         when(marcaRepository.findById(2L))
                 .thenReturn(marcas);
@@ -164,28 +170,27 @@ class MarcaServiceTest {
             marcaService.alterarMarca(2L, marca);
         });
 
-        String expectedMessage = "Marca não encontrada";
         String actualMessage = exception.getMessage();
 
-        assertEquals(expectedMessage, actualMessage);
+        assertEquals(MARCA_NAO_ENCONTRADA_MENSAGEM, actualMessage);
     }
 
     @Test
     void deveRetornarMarcaAlteradaAoAlterarMarca() {
-        MarcaDto marca = new MarcaDto(1L, "Ferrari");
-        Optional<Marca> marcas = Optional.of(
-                new Marca(1L, "Audi")
+        MarcaDto marca = new MarcaDto(1L, MARCA_FERRARI);
+        Optional<Marca> marcaRegistrada = Optional.of(
+                new Marca(1L, MARCA_AUDI)
         );
 
         when(marcaRepository.findById(1L))
-                .thenReturn(marcas);
+                .thenReturn(marcaRegistrada);
 
         when(marcaRepository.findByNome(marca.getNome()))
                 .thenReturn(Optional.empty());
 
         var marcaAlterada = marcaService.alterarMarca(1L, marca);
 
-        assertEquals(marcas.get().getNome(), marcaAlterada.getNome());
+        assertEquals(MARCA_FERRARI, marcaAlterada.getNome());
     }
 
     @Test
@@ -199,16 +204,15 @@ class MarcaServiceTest {
             marcaService.deletarMarca(2L);
         });
 
-        String expectedMessage = "Marca não encontrada";
         String actualMessage = exception.getMessage();
 
-        assertEquals(expectedMessage, actualMessage);
+        assertEquals(MARCA_NAO_ENCONTRADA_MENSAGEM, actualMessage);
     }
 
     @Test
     void deveRetornarMarcaExcluidaAoExcluirMarca() {
         Optional<Marca> marcas = Optional.of(
-                new Marca(1L, "Audi")
+                new Marca(1L, MARCA_AUDI)
         );
 
         when(marcaRepository.findById(1L))

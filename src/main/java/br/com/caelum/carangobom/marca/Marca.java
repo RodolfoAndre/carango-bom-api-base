@@ -6,6 +6,9 @@ import javax.persistence.Id;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
+/**
+ * Classe responsável por gerenciar a entidade marca
+ */
 @Entity
 public class Marca {
 
