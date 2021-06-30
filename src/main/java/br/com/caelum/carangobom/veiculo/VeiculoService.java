@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class VeiculoService {
@@ -22,20 +23,20 @@ public class VeiculoService {
     }
 
     @Transactional
-    public List<Veiculo> listarVeiculos() {
-        return veiculoRepository.findAllByOrderByModelo();
+    public List<VeiculoDto> listarVeiculos() {
+        return veiculoRepository.findAllByOrderByModelo().stream().map(veiculoDtoMapper::map).collect(Collectors.toList());
     }
 
     @Transactional
-    public Veiculo obterVeiculoPorId(Long id) {
+    public VeiculoDto obterVeiculoPorId(Long id) {
         Optional<Veiculo> veiculo = veiculoRepository.findById(id);
-        return veiculo.orElseThrow(() -> new NotFoundException("Veículo não encontrado"));
+        return veiculoDtoMapper.map(veiculo.orElseThrow(() -> new NotFoundException("Veículo não encontrado")));
     }
 
     @Transactional
-    public Veiculo deletarVeiculo(Long id) {
+    public VeiculoDto deletarVeiculo(Long id) {
         var veiculoEncontrado = obterVeiculoPorId(id);
-        veiculoRepository.delete(veiculoEncontrado);
+        veiculoRepository.deleteById(veiculoEncontrado.getId());
         return veiculoEncontrado;
     }
 }

@@ -1,8 +1,11 @@
 package br.com.caelum.carangobom.veiculo;
 
 import br.com.caelum.carangobom.marca.Marca;
+import br.com.caelum.carangobom.marca.MarcaRepository;
 
 import javax.persistence.*;
+
+import java.util.Optional;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -32,6 +35,11 @@ public class Veiculo {
         this.ano = ano;
         this.valor = valor;
         this.marca = marca;
+    }
+
+    public Veiculo converter(MarcaRepository marcaRepository){
+        Optional<Marca> marca = marcaRepository.findById(getMarca().getId());
+        return new Veiculo(modelo, ano, valor, marca.get());
     }
 
     public Long getId() {

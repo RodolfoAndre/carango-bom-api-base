@@ -2,6 +2,7 @@ package br.com.caelum.carangobom.veiculo;
 
 import br.com.caelum.carangobom.exception.NotFoundException;
 import br.com.caelum.carangobom.marca.Marca;
+import br.com.caelum.carangobom.marca.MarcaDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -36,20 +37,20 @@ class VeiculoControllerTest {
 
     @Test
     void deveRetornarListaDeVeiculosQuandoHouverResultados() {
-        List<Marca> marcas = List.of(
-                new Marca(1L, "Ford"),
-                new Marca(2L, "GM")
+        List<MarcaDto> marcas = List.of(
+                new MarcaDto(1L, "Ford"),
+                new MarcaDto(2L, "GM")
         );
 
-        List<Veiculo> veiculos = List.of(
-                new Veiculo(1L, "KA", 2008, 15.000, marcas.get(0)),
-                new Veiculo(2L, "Corsa", 2008, 15.000, marcas.get(1))
+        List<VeiculoDto> veiculos = List.of(
+                new VeiculoDto(1L, "KA", 2008, 15.000, marcas.get(0).getNome()),
+                new VeiculoDto(2L, "Corsa", 2008, 15.000, marcas.get(1).getNome())
         );
 
         when(veiculoService.listarVeiculos())
                 .thenReturn(veiculos);
 
-        ResponseEntity<List<Veiculo>> resultado = veiculoController.listarVeiculos();
+        ResponseEntity<List<VeiculoDto>> resultado = veiculoController.listarVeiculos();
 
         assertEquals(veiculos, resultado.getBody());
         assertEquals(HttpStatus.OK, resultado.getStatusCode());
@@ -57,16 +58,16 @@ class VeiculoControllerTest {
 
     @Test
     void deveRetornarVeiculoPeloId() {
-        List<Marca> marcas = List.of(
-                new Marca(1L, "Ford")
+        List<MarcaDto> marcas = List.of(
+                new MarcaDto(1L, "Ford")
         );
 
-        Veiculo veiculo = new Veiculo(1L, "KA", 2008, 15.000, marcas.get(0));
+        VeiculoDto veiculo = new VeiculoDto(1L, "KA", 2008, 15.000, marcas.get(0).getNome());
 
         when(veiculoService.obterVeiculoPorId(1L))
                 .thenReturn(veiculo);
 
-        ResponseEntity<Veiculo> resposta = veiculoController.obterVeiculoPorId(1L);
+        ResponseEntity<VeiculoDto> resposta = veiculoController.obterVeiculoPorId(1L);
         assertEquals(veiculo, resposta.getBody());
         assertEquals(HttpStatus.OK, resposta.getStatusCode());
     }
@@ -76,22 +77,22 @@ class VeiculoControllerTest {
         when(veiculoService.obterVeiculoPorId(anyLong()))
                 .thenThrow(new NotFoundException("Veículo não encontrado"));
 
-        ResponseEntity<Veiculo> resposta = veiculoController.obterVeiculoPorId(1L);
+        ResponseEntity<VeiculoDto> resposta = veiculoController.obterVeiculoPorId(1L);
         assertEquals(HttpStatus.NOT_FOUND, resposta.getStatusCode());
     }
 
     @Test
     void deveDeletarVeiculoExistente() {
-        List<Marca> marcas = List.of(
-                new Marca(1L, "Ford")
+        List<MarcaDto> marcas = List.of(
+                new MarcaDto(1L, "Ford")
         );
 
-        Veiculo veiculo = new Veiculo(1L, "KA", 2008, 15.000, marcas.get(0));
+        VeiculoDto veiculo = new VeiculoDto(1L, "KA", 2008, 15.000, marcas.get(0).getNome());
 
         when(veiculoService.obterVeiculoPorId(1L))
                 .thenReturn(veiculo);
 
-        ResponseEntity<Veiculo> resposta = veiculoController.deletarVeiculo(1L);
+        ResponseEntity<VeiculoDto> resposta = veiculoController.deletarVeiculo(1L);
         assertEquals(HttpStatus.OK, resposta.getStatusCode());
         verify(veiculoService).deletarVeiculo(veiculo.getId());
     }
@@ -101,7 +102,7 @@ class VeiculoControllerTest {
         when(veiculoService.deletarVeiculo(anyLong()))
                 .thenThrow(new NotFoundException("Veículo não encontrado"));
 
-        ResponseEntity<Veiculo> resposta = veiculoController.deletarVeiculo(1L);
+        ResponseEntity<VeiculoDto> resposta = veiculoController.deletarVeiculo(1L);
         assertEquals(HttpStatus.NOT_FOUND, resposta.getStatusCode());
     }
 }

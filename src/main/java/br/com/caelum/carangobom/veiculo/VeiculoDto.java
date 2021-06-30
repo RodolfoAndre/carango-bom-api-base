@@ -2,16 +2,22 @@ package br.com.caelum.carangobom.veiculo;
 
 import br.com.caelum.carangobom.marca.Marca;
 import br.com.caelum.carangobom.marca.MarcaDto;
+import br.com.caelum.carangobom.shared.BasicEntityDto;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class VeiculoDto {
-
-    private Long id;
+@Getter
+@Setter
+@AllArgsConstructor
+public class VeiculoDto extends BasicEntityDto {
 
     @NotBlank
     @Size(min = 2, message = "Deve ter {min} ou mais caracteres.")
@@ -26,9 +32,9 @@ public class VeiculoDto {
     private Double valor;
 
     @NotBlank
-    private MarcaDto marca;
+    private String marca;
 
-    public VeiculoDto(Long id, String modelo, Integer ano, Double valor, MarcaDto marca) {
+    public VeiculoDto(Long id, String modelo, Integer ano, Double valor, String marca) {
         this.id = id;
         this.modelo = modelo;
         this.ano = ano;
@@ -36,23 +42,31 @@ public class VeiculoDto {
         this.marca = marca;
     }
 
-    public Long getId() { return id; }
+    @Override
+    public boolean equals(Object that) {
+        if (this == that) {
+            return true;
+        }
+        if (that == null || getClass() != that.getClass()) {
+            return false;
+        }
+        VeiculoDto veiculoDto = (VeiculoDto) that;
+        return Objects.equals(modelo, veiculoDto.modelo);
+    }
 
-    public void setId(Long id) { this.id = id; }
+    @Override
+    public int hashCode() {
+        return Objects.hash(modelo);
+    }
 
-    public String getModelo() { return modelo; }
-
-    public void setModelo(String modelo) { this.modelo = modelo; }
-
-    public Integer getAno() { return ano; }
-
-    public void setAno(Integer ano) { this.ano = ano; }
-
-    public Double getValor() { return valor; }
-
-    public void setValor(Double valor) { this.valor = valor; }
-
-    public MarcaDto getMarca() { return marca; }
-
-    public void setMarca(MarcaDto marca) { this.marca = marca; }
+    @Override
+    public String toString() {
+        return "VeiculoDto{" +
+                "modelo='" + modelo + '\'' +
+                ", marca=" + marca +
+                ", ano='" + ano + '\'' +
+                ", valor='" + valor + '\'' +
+                ", id=" + id +
+                '}';
+    }
 }

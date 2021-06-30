@@ -1,10 +1,7 @@
 package br.com.caelum.carangobom.veiculo;
 
 import br.com.caelum.carangobom.exception.NotFoundException;
-import br.com.caelum.carangobom.marca.Marca;
-import br.com.caelum.carangobom.marca.MarcaDtoMapper;
-import br.com.caelum.carangobom.marca.MarcaRepository;
-import br.com.caelum.carangobom.marca.MarcaService;
+import br.com.caelum.carangobom.marca.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -12,6 +9,7 @@ import org.mockito.Mock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doReturn;
@@ -47,13 +45,15 @@ class VeiculoServiceTest {
                 new Veiculo(2L, "Corsa", 2008, 15.000, marcas.get(1))
         );
 
+        List<VeiculoDto> veiculosEsperados = veiculos.stream().map(veiculoDtoMapper::map).collect(Collectors.toList());
+
         when(veiculoRepository.findAllByOrderByModelo())
                 .thenReturn(veiculos);
 
         var veiculosRetornados = veiculoService.listarVeiculos();
 
         assertNotNull(veiculosRetornados);
-        assertEquals(veiculos, veiculosRetornados);
+        assertEquals(veiculosEsperados, veiculosRetornados);
     }
 
     @Test
@@ -74,17 +74,19 @@ class VeiculoServiceTest {
                 new Marca(1L, "Ford")
         );
 
-        Optional<Veiculo> veiculos = Optional.of(
+        Optional<Veiculo> veiculo = Optional.of(
                 new Veiculo(1L, "KA", 2008, 15.000, marcas.get(0))
         );
 
+        var veiculoEsperado = veiculoDtoMapper.map(veiculo.get());
+
         when(veiculoRepository.findById(1L))
-                .thenReturn(veiculos);
+                .thenReturn(veiculo);
 
         var veiculosRetornados = veiculoService.obterVeiculoPorId(1L);
 
         assertNotNull(veiculosRetornados);
-        assertEquals(veiculos.get(), veiculosRetornados);
+        assertEquals(veiculoEsperado, veiculosRetornados);
     }
 
     @Test

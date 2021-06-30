@@ -12,7 +12,11 @@ public class VeiculoDtoMapper {
         return new Veiculo(source.getId(), source.getModelo(), source.getAno(), source.getValor(), marca);
     }
 
-    public VeiculoDto map(Veiculo source, MarcaDto marca) {
-        return new VeiculoDto(source.getId(), source.getModelo(), source.getAno(), source.getValor(), marca);
+//    public VeiculoDto map(Veiculo source, MarcaDto marca) {
+//        return new VeiculoDto(source.getId(), source.getModelo(), source.getAno(), source.getValor(), marca);
+//    }
+
+    public VeiculoDto map(Veiculo source) {
+        return new VeiculoDto(source.getId(), source.getModelo(), source.getAno(), source.getValor(), source.getMarca().getNome());
     }
 }
