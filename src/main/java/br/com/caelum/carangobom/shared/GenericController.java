@@ -1,9 +1,18 @@
 package br.com.caelum.carangobom.shared;
 
 import br.com.caelum.carangobom.exception.NotFoundException;
+import br.com.caelum.carangobom.validacao.ErroDeParametroOutputDto;
+import br.com.caelum.carangobom.validacao.ListaDeErrosOutputDto;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 public abstract class GenericController {
@@ -40,5 +49,41 @@ public abstract class GenericController {
         } catch (NotFoundException notFoundException) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    /**
+     * Valida os parâmetros passados nas requisições de acordo com as regras definidas nos Dto's
+     * @param excecao a exceção capturada
+     * @return {@link ListaDeErrosOutputDto} com a lista de erros
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseBody
+    public ListaDeErrosOutputDto validarParametrosRequisicao(MethodArgumentNotValidException excecao) {
+        var listaDeErrosOutput = new ListaDeErrosOutputDto();
+
+        var listaDeErro = montarListaDeErros(excecao);
+        listaDeErrosOutput.setErros(listaDeErro);
+        return listaDeErrosOutput;
+    }
+
+    /**
+     * Monta a lista de erros
+     * @param excecao a exceção capturada
+     * @return {@link List<ErroDeParametroOutputDto>} com a lista de erros
+     */
+    private List<ErroDeParametroOutputDto> montarListaDeErros(MethodArgumentNotValidException excecao){
+        List<ErroDeParametroOutputDto> listaDeErro = new ArrayList<>();
+        var resultados = excecao.getBindingResult();
+        var errosDeCampo = resultados.getFieldErrors();
+
+        errosDeCampo.forEach(erro -> {
+            var erroDeParametro = new ErroDeParametroOutputDto();
+            erroDeParametro.setParametro(erro.getField());
+            erroDeParametro.setMensagem(erro.getDefaultMessage());
+            listaDeErro.add(erroDeParametro);
+        });
+
+        return listaDeErro;
     }
 }
