@@ -1,12 +1,17 @@
 package br.com.caelum.carangobom.veiculo;
 
 import br.com.caelum.carangobom.shared.GenericController;
+import br.com.caelum.carangobom.validacao.ErroDeParametroOutputDto;
+import br.com.caelum.carangobom.validacao.ListaDeErrosOutputDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
