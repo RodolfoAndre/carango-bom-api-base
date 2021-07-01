@@ -3,6 +3,7 @@ package br.com.caelum.carangobom.veiculo;
 import br.com.caelum.carangobom.shared.BasicEntityDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.Min;
@@ -16,17 +17,16 @@ import java.util.Objects;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class VeiculoDto extends BasicEntityDto {
 
     @NotBlank
     @Size(min = 2, message = "Deve ter {min} ou mais caracteres.")
     private String modelo;
 
-    @NotBlank
-    @Size(min = 4, max = 4, message = "Deve ter 4 caracteres.")
+    @Min(value = 1800, message = "Deve ter 4 caracteres.")
     private Integer ano;
 
-    @NotBlank
     @Min(value = 0, message = "Valor deve ser maior que zero.")
     private Double valor;
 
