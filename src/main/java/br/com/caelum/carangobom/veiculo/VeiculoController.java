@@ -10,8 +10,9 @@ import javax.validation.Valid;
 import java.util.List;
 
 /**
- * Classe reponsável pelo controller de veiíulo.
+ * Classe reponsável pelo controller de veículo.
  */
+@CrossOrigin
 @Controller
 public class VeiculoController extends GenericController {
 
