@@ -24,7 +24,7 @@ public class VeiculoDtoMapper {
     /**
      * Mapeia um {@link Veiculo} para um {@link VeiculoDto}
      *
-     * @param source a veículo a ser convertido
+     * @param source o veículo a ser convertido
      * @return a representação do objeto em formato de {@link VeiculoDto}
      */
     public VeiculoDto map(Veiculo source) {

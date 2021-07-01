@@ -52,7 +52,7 @@ public class VeiculoService {
      * Obtém veículos por id
      *
      * @param id o id do veículo a ser obtido
-     * @return a {@link VeiculoDto} encontrado
+     * @return o {@link VeiculoDto} encontrado
      */
     @Transactional
     public VeiculoDto obterVeiculoPorId(Long id) {
