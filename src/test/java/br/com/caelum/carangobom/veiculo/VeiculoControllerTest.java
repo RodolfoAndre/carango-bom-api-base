@@ -13,12 +13,15 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 class VeiculoControllerTest {
+
+    public static final String VEICULO_NAO_ENCONTRADO_MENSAGEM = "Veículo não encontrado";
 
     private UriComponentsBuilder uriBuilder;
 
@@ -75,9 +78,49 @@ class VeiculoControllerTest {
     @Test
     void deveRetornarNotFoundQuandoTentarBuscarVeiculoComIdInexistente() {
         when(veiculoService.obterVeiculoPorId(anyLong()))
-                .thenThrow(new NotFoundException("Veículo não encontrado"));
+                .thenThrow(new NotFoundException(VEICULO_NAO_ENCONTRADO_MENSAGEM));
 
         ResponseEntity<VeiculoDto> resposta = veiculoController.obterVeiculoPorId(1L);
+        assertEquals(HttpStatus.NOT_FOUND, resposta.getStatusCode());
+    }
+
+    @Test
+    void deveResponderCreatedELocationQuandoCadastrarVeiculo() {
+        MarcaDto marcaDto = new MarcaDto(1L, "Ford");
+        VeiculoDto novoVeiculoDto = new VeiculoDto(null, "KA", 2008, 15.000, marcaDto.getNome());
+
+        when(veiculoService.cadastrarVeiculo(novoVeiculoDto))
+                .thenReturn(new VeiculoDto(1L, "KA", 2008, 15.000, marcaDto.getNome()));
+
+        ResponseEntity<VeiculoDto> resposta = veiculoController.cadastrarVeiculo(novoVeiculoDto, uriBuilder);
+        assertEquals(HttpStatus.CREATED, resposta.getStatusCode());
+        assertEquals("http://localhost:8080/veiculos/1", resposta.getHeaders().getLocation().toString());
+    }
+
+    @Test
+    void deveAlterarValorVeiculo() {
+        MarcaDto marcaDto = new MarcaDto(1L, "Ford");
+        VeiculoDto veiculoDto = new VeiculoDto(1L, "KA", 2008, 15.000, marcaDto.getNome());
+        VeiculoDto veiculoDtoAlterado = new VeiculoDto(1L, "KA", 2008, 16.700, marcaDto.getNome());
+
+        when(veiculoService.alterarVeiculo(1L, veiculoDto))
+                .thenReturn(veiculoDtoAlterado);
+
+        ResponseEntity<VeiculoDto> resposta = veiculoController.alterarVeiculo(1L, veiculoDto);
+        assertEquals(HttpStatus.OK, resposta.getStatusCode());
+
+        VeiculoDto veiculoAlterado = resposta.getBody();
+        assertNotNull(veiculoAlterado);
+        assertEquals(16.700, veiculoAlterado.getValor());
+    }
+
+    @Test
+    void naoDeveAlterarVeiculoInexistente() {
+        MarcaDto marcaDto = new MarcaDto(1L, "Ford");
+        when(veiculoService.alterarVeiculo(anyLong(), any(VeiculoDto.class)))
+                .thenThrow(new NotFoundException(VEICULO_NAO_ENCONTRADO_MENSAGEM));
+
+        ResponseEntity<VeiculoDto> resposta = veiculoController.alterarVeiculo(1L, new VeiculoDto(1L, "KA", 2008, 16.700, marcaDto.getNome()));
         assertEquals(HttpStatus.NOT_FOUND, resposta.getStatusCode());
     }
 
@@ -100,7 +143,7 @@ class VeiculoControllerTest {
     @Test
     void deveDarErroAoTentarDeletarVeiculoInexistente() {
         when(veiculoService.deletarVeiculo(anyLong()))
-                .thenThrow(new NotFoundException("Veículo não encontrado"));
+                .thenThrow(new NotFoundException(VEICULO_NAO_ENCONTRADO_MENSAGEM));
 
         ResponseEntity<VeiculoDto> resposta = veiculoController.deletarVeiculo(1L);
         assertEquals(HttpStatus.NOT_FOUND, resposta.getStatusCode());

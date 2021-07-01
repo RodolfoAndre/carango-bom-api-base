@@ -1,19 +1,18 @@
 package br.com.caelum.carangobom.veiculo;
 
-import br.com.caelum.carangobom.marca.Marca;
-import br.com.caelum.carangobom.marca.MarcaDto;
 import br.com.caelum.carangobom.shared.BasicEntityDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
+/**
+ * Objeto de transferência de dado usado para veículo
+ */
 @Getter
 @Setter
 @AllArgsConstructor
@@ -28,7 +27,7 @@ public class VeiculoDto extends BasicEntityDto {
     private Integer ano;
 
     @NotBlank
- //   @DecimalMin( , message = "Valor deve ser maior que zero.")
+    @Min(value = 0, message = "Valor deve ser maior que zero.")
     private Double valor;
 
     @NotBlank

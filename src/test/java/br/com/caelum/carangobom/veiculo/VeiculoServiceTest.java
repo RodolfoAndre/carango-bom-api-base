@@ -1,5 +1,6 @@
 package br.com.caelum.carangobom.veiculo;
 
+import br.com.caelum.carangobom.exception.ConflictException;
 import br.com.caelum.carangobom.exception.NotFoundException;
 import br.com.caelum.carangobom.marca.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,14 +13,21 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 class VeiculoServiceTest {
 
+    public static final String VEICULO_NAO_ENCONTRADO_MENSAGEM = "Veículo não encontrado";
+    public static final String MARCA_NAO_ENCONTRADA_MENSAGEM = "Marca informada não encontrada";
+
     @Mock
     private VeiculoRepository veiculoRepository;
+
+    @Mock
+    private MarcaRepository marcaRepository;
 
     private VeiculoService veiculoService;
 
@@ -30,7 +38,7 @@ class VeiculoServiceTest {
         openMocks(this);
 
         veiculoDtoMapper = new VeiculoDtoMapper();
-        veiculoService = new VeiculoService(veiculoRepository, veiculoDtoMapper);
+        veiculoService = new VeiculoService(veiculoRepository, marcaRepository, veiculoDtoMapper);
     }
 
     @Test
@@ -100,10 +108,88 @@ class VeiculoServiceTest {
             veiculoService.obterVeiculoPorId(2L);
         });
 
-        String expectedMessage = "Veículo não encontrado";
+        String expectedMessage = VEICULO_NAO_ENCONTRADO_MENSAGEM;
         String actualMessage = exception.getMessage();
 
         assertEquals(expectedMessage, actualMessage);
+    }
+
+    @Test
+    void deveRetornarExcecaoNotFoundAoTentarCadastrarVeiculoEObterMarcaPorNomeNaoEncontrarMarca() {
+        Optional<Marca> marcas = Optional.empty();
+        VeiculoDto veiculoDto = new VeiculoDto(null, "KA", 2008, 15.000, "Ford");
+
+        when(marcaRepository.findByNome(veiculoDto.getMarca()))
+                .thenReturn(marcas);
+
+        Exception exception = assertThrows(NotFoundException.class, () -> {
+            veiculoService.cadastrarVeiculo(veiculoDto);
+        });
+
+        String actualMessage = exception.getMessage();
+
+        assertEquals(MARCA_NAO_ENCONTRADA_MENSAGEM, actualMessage);
+    }
+
+    @Test
+    void deveRetornarNovoVeiculoCadastrado() {
+        Optional<Marca> marca = Optional.of(
+                new Marca(1L, "Ford")
+        );
+        VeiculoDto veiculoDto = new VeiculoDto(null, "KA", 2008, 15.000, "Ford");
+        Veiculo novoVeiculo = new Veiculo(1L, "KA", 2008, 15.000, marca.get());
+
+        when(marcaRepository.findByNome(veiculoDto.getMarca()))
+                .thenReturn(marca);
+
+        when(veiculoRepository.save(any(Veiculo.class)))
+                .thenReturn(novoVeiculo);
+
+        var veiculoCadastrado = veiculoService.cadastrarVeiculo(veiculoDto);
+
+        assertEquals(veiculoDto.getModelo(), veiculoCadastrado.getModelo());
+    }
+
+    @Test
+    void deveRetornarExcecaoNotFoundAoTentarEditarVeiculoEObterMarcaPorNomeNaoEncontrarMarca() {
+        Optional<Marca> marcas = Optional.empty();
+        VeiculoDto veiculoDto = new VeiculoDto(1L, "KA", 2008, 15.000, "Ford");
+
+        when(marcaRepository.findByNome(veiculoDto.getMarca()))
+                .thenReturn(marcas);
+
+        Exception exception = assertThrows(NotFoundException.class, () -> {
+            veiculoService.alterarVeiculo(1L, veiculoDto);
+        });
+
+        String actualMessage = exception.getMessage();
+
+        assertEquals(MARCA_NAO_ENCONTRADA_MENSAGEM, actualMessage);
+    }
+
+    @Test
+    void deveRetornarValorVeiculoAlteradoAoAlterarVeiculo() {
+        Optional<Marca> marca = Optional.of(
+                new Marca(1L, "Ford")
+        );
+        Optional<Veiculo> veiculo = Optional.of(
+                new Veiculo(1L, "KA", 2008, 15.000, marca.get())
+        );
+        VeiculoDto veiculoDto = new VeiculoDto(1L, "KA", 2008, 17.800, "Ford");
+        Veiculo veiculoAlterado = new Veiculo(1L, "KA", 2008, 17.800, marca.get());
+
+        when(marcaRepository.findByNome(veiculoDto.getMarca()))
+                .thenReturn(marca);
+
+        when(veiculoRepository.findById(1L))
+                .thenReturn(veiculo);
+
+        when(veiculoRepository.save(any(Veiculo.class)))
+                .thenReturn(veiculoAlterado);
+
+        var veiculoAlteradoDto = veiculoService.alterarVeiculo(1L, veiculoDto);
+
+        assertEquals(17.800, veiculoAlteradoDto.getValor());
     }
 
     @Test
@@ -117,7 +203,7 @@ class VeiculoServiceTest {
             veiculoService.deletarVeiculo(2L);
         });
 
-        String expectedMessage = "Veículo não encontrado";
+        String expectedMessage = VEICULO_NAO_ENCONTRADO_MENSAGEM;
         String actualMessage = exception.getMessage();
 
         assertEquals(expectedMessage, actualMessage);
