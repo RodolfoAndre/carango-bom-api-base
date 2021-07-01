@@ -2,6 +2,7 @@ package br.com.caelum.carangobom.marca;
 
 import br.com.caelum.carangobom.exception.ConflictException;
 import br.com.caelum.carangobom.exception.NotFoundException;
+import br.com.caelum.carangobom.veiculo.Veiculo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -177,10 +178,11 @@ class MarcaServiceTest {
 
     @Test
     void deveRetornarMarcaAlteradaAoAlterarMarca() {
-        MarcaDto marca = new MarcaDto(1L, MARCA_FERRARI);
+        MarcaDto marcaDto = new MarcaDto(1L, MARCA_FERRARI);
         Optional<Marca> marcaRegistrada = Optional.of(
                 new Marca(1L, MARCA_AUDI)
         );
+        Marca marca = new Marca(1L, MARCA_FERRARI);
 
         when(marcaRepository.findById(1L))
                 .thenReturn(marcaRegistrada);
@@ -188,7 +190,10 @@ class MarcaServiceTest {
         when(marcaRepository.findByNome(marca.getNome()))
                 .thenReturn(Optional.empty());
 
-        var marcaAlterada = marcaService.alterarMarca(1L, marca);
+        when(marcaRepository.save(any(Marca.class)))
+                .thenReturn(marca);
+
+        var marcaAlterada = marcaService.alterarMarca(1L, marcaDto);
 
         assertEquals(MARCA_FERRARI, marcaAlterada.getNome());
     }
@@ -218,9 +223,9 @@ class MarcaServiceTest {
         when(marcaRepository.findById(1L))
                 .thenReturn(marcas);
 
-        var marcaAlterada = marcaService.deletarMarca(1L);
+        var marcaDeletada = marcaService.deletarMarca(1L);
 
-        assertEquals(marcas.get().getNome(), marcaAlterada.getNome());
+        assertEquals(marcas.get().getNome(), marcaDeletada.getNome());
     }
 
 }
