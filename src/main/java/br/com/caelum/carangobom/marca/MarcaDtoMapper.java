@@ -1,12 +1,13 @@
 package br.com.caelum.carangobom.marca;
 
+import br.com.caelum.carangobom.shared.estrutura.ObjectMappeable;
 import org.springframework.stereotype.Component;
 
 /**
  * Conversor de tipos de objeto marca
  */
 @Component
-public class MarcaDtoMapper {
+public class MarcaDtoMapper implements ObjectMappeable<Marca, MarcaDto> {
 
     /**
      * Mapeia uma {@link MarcaDto} para uma {@link Marca}
@@ -14,7 +15,7 @@ public class MarcaDtoMapper {
      * @param source a marca a ser convertida
      * @return a representação do objeto em formato de {@link Marca}
      */
-    public Marca map(MarcaDto source) {
+    public Marca converterParaEntidade(MarcaDto source) {
         return new Marca(source.getId(), source.getNome());
     }
 
@@ -24,7 +25,7 @@ public class MarcaDtoMapper {
      * @param source a marca a ser convertida
      * @return a representação do objeto em formato de {@link MarcaDto}
      */
-    public MarcaDto map(Marca source) {
+    public MarcaDto converterParaDto(Marca source) {
         return new MarcaDto(source.getId(), source.getNome());
     }
 }

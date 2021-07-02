@@ -1,6 +1,6 @@
 package br.com.caelum.carangobom.veiculo;
 
-import br.com.caelum.carangobom.shared.BasicEntityDto;
+import br.com.caelum.carangobom.shared.estrutura.BasicEntityDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

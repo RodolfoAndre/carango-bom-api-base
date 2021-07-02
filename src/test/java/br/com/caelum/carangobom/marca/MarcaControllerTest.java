@@ -42,7 +42,7 @@ class MarcaControllerTest {
             new MarcaDto(3L, "Fiat")
         );
 
-        when(marcaService.listarMarcas())
+        when(marcaService.listar())
             .thenReturn(marcas);
 
         ResponseEntity<List<MarcaDto>> resultado = marcaController.listarMarcas();
@@ -55,7 +55,7 @@ class MarcaControllerTest {
     void deveRetornarMarcaPeloId() {
         MarcaDto audi = new MarcaDto(1L, "Audi");
 
-        when(marcaService.obterMarcaPorId(1L))
+        when(marcaService.obterPorId(1L))
             .thenReturn(audi);
 
         ResponseEntity<MarcaDto> resposta = marcaController.obterMarcaPorId(1L);
@@ -65,7 +65,7 @@ class MarcaControllerTest {
 
     @Test
     void deveRetornarNotFoundQuandoRecuperarMarcaComIdInexistente() {
-        when(marcaService.obterMarcaPorId(anyLong()))
+        when(marcaService.obterPorId(anyLong()))
                 .thenThrow(new NotFoundException("Marca não encontrada"));
 
         ResponseEntity<MarcaDto> resposta = marcaController.obterMarcaPorId(1L);
@@ -113,17 +113,17 @@ class MarcaControllerTest {
     void deveDeletarMarcaExistente() {
         MarcaDto audi = new MarcaDto(1L, "Audi");
 
-        when(marcaService.obterMarcaPorId(1L))
+        when(marcaService.obterPorId(1L))
             .thenReturn(audi);
 
         ResponseEntity<MarcaDto> resposta = marcaController.deletarMarca(1L);
         assertEquals(HttpStatus.OK, resposta.getStatusCode());
-        verify(marcaService).deletarMarca(audi.getId());
+        verify(marcaService).deletar(audi.getId());
     }
 
     @Test
     void deveDarErroAoTentarDeletarMarcaInexistente() {
-        when(marcaService.deletarMarca(anyLong()))
+        when(marcaService.deletar(anyLong()))
                 .thenThrow(new NotFoundException("Marca não encontrada"));
 
         ResponseEntity<MarcaDto> resposta = marcaController.deletarMarca(1L);

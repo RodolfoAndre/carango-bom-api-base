@@ -1,4 +1,4 @@
-package br.com.caelum.carangobom.shared;
+package br.com.caelum.carangobom.shared.estrutura;
 
 import br.com.caelum.carangobom.exception.NotFoundException;
 import br.com.caelum.carangobom.validacao.ErroDeParametroOutputDto;
@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * Classe genérica de controller
+ */
 public abstract class GenericController {
 
     /**

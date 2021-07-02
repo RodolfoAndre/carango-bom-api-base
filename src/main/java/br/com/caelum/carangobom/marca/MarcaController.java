@@ -1,20 +1,15 @@
 package br.com.caelum.carangobom.marca;
 
-import br.com.caelum.carangobom.shared.GenericController;
-import br.com.caelum.carangobom.validacao.ErroDeParametroOutputDto;
-import br.com.caelum.carangobom.validacao.ListaDeErrosOutputDto;
+import br.com.caelum.carangobom.shared.estrutura.GenericController;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,6 +17,7 @@ import java.util.List;
  */
 @CrossOrigin
 @Controller
+@RequestMapping("/marcas")
 public class MarcaController extends GenericController {
 
     private final MarcaService marcaService;
@@ -42,10 +38,10 @@ public class MarcaController extends GenericController {
      * @return {@link ResponseEntity} com o resultado da requisição. Caso ocorra tudo como esperado, deverá retornar
      * com "status code" 200 e as marcas disponíveis em seu "body"
      */
-    @GetMapping("/marcas")
+    @GetMapping
     @ResponseBody
     public ResponseEntity<List<MarcaDto>> listarMarcas() {
-        return encapsulaResultadoOk(marcaService::listarMarcas);
+        return encapsulaResultadoOk(marcaService::listar);
     }
 
     /**
@@ -55,10 +51,10 @@ public class MarcaController extends GenericController {
      * @return {@link ResponseEntity} com o resultado da requisição. Caso ocorra tudo como esperado, deverá retornar
      * com "status code" 200 (ok) e as marcas disponíveis em seu "body", caso não seja, retornará "status code" 404 (not found).
      */
-    @GetMapping("/marcas/{id}")
+    @GetMapping("/{id}")
     @ResponseBody
     public ResponseEntity<MarcaDto> obterMarcaPorId(@PathVariable Long id) {
-        return encapsulaResultadoOk(() -> marcaService.obterMarcaPorId(id));
+        return encapsulaResultadoOk(() -> marcaService.obterPorId(id));
     }
 
     /**
@@ -69,7 +65,7 @@ public class MarcaController extends GenericController {
      * @return {@link ResponseEntity} com o resultado da requisição. Caso ocorra tudo como esperado, deverá retornar
      * com "status code" 200 (ok), caso não seja, retornará "status code" 404 (not found).
      */
-    @PostMapping("/marcas")
+    @PostMapping
     @ResponseBody
     public ResponseEntity<MarcaDto> cadastrarMarca(@Valid @RequestBody MarcaDto marcaDto, UriComponentsBuilder uriBuilder) {
         return encapsularResultadoCreated(() -> marcaService.cadastrarMarca(marcaDto), uriBuilder, "/marcas/{id}");
@@ -83,7 +79,7 @@ public class MarcaController extends GenericController {
      * @return {@link ResponseEntity} com o resultado da requisição. Caso ocorra tudo como esperado, deverá retornar
      * com "status code" 200 (ok), caso não seja, retornará "status code" 404 (not found).
      */
-    @PutMapping("/marcas/{id}")
+    @PutMapping("/{id}")
     @ResponseBody
     public ResponseEntity<MarcaDto> alterarMarca(@PathVariable Long id, @Valid @RequestBody MarcaDto marcaDto) {
         return encapsulaResultadoOk(() -> marcaService.alterarMarca(id, marcaDto));
@@ -96,10 +92,10 @@ public class MarcaController extends GenericController {
      * @return {@link ResponseEntity} com o resultado da requisição. Caso ocorra tudo como esperado, deverá retornar
      * com "status code" 200 (ok), caso não seja, retornará "status code" 404 (not found).
      */
-    @DeleteMapping("/marcas/{id}")
+    @DeleteMapping("/{id}")
     @ResponseBody
     @Transactional
     public ResponseEntity<MarcaDto> deletarMarca(@PathVariable Long id) {
-        return encapsulaResultadoOk(() -> marcaService.deletarMarca(id));
+        return encapsulaResultadoOk(() -> marcaService.deletar(id));
     }
 }

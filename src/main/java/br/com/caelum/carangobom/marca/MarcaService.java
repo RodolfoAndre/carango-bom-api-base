@@ -2,6 +2,7 @@ package br.com.caelum.carangobom.marca;
 
 import br.com.caelum.carangobom.exception.ConflictException;
 import br.com.caelum.carangobom.exception.NotFoundException;
+import br.com.caelum.carangobom.shared.estrutura.GenericCRUDService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
  * Classe responsável pela lógica de negócios de marcas
  */
 @Service
-public class MarcaService {
+public class MarcaService extends GenericCRUDService<Marca, MarcaDto> {
 
     private MarcaRepository marcaRepository;
 
@@ -28,30 +29,9 @@ public class MarcaService {
      */
     @Autowired
     public MarcaService(MarcaRepository marcaRepository, MarcaDtoMapper marcaDtoMapper) {
+        super(marcaRepository, marcaDtoMapper);
         this.marcaRepository = marcaRepository;
         this.marcaDtoMapper = marcaDtoMapper;
-    }
-
-    /**
-     * Lista todas as marcas que estão presentes no banco de dados
-     *
-     * @return uma {@link List} de {@link MarcaDto}
-     */
-    @Transactional
-    public List<MarcaDto> listarMarcas() {
-        return marcaRepository.findAllByOrderByNome().stream().map(marcaDtoMapper::map).collect(Collectors.toList());
-    }
-
-    /**
-     * Obtém marcas por id
-     *
-     * @param id o id da marca a ser obtida
-     * @return a {@link MarcaDto} encontrada
-     */
-    @Transactional
-    public MarcaDto obterMarcaPorId(Long id) {
-        Optional<Marca> marca = marcaRepository.findById(id);
-        return marcaDtoMapper.map(marca.orElseThrow(() -> new NotFoundException("Marca não encontrada")));
     }
 
     /**
@@ -64,8 +44,8 @@ public class MarcaService {
     public MarcaDto cadastrarMarca(MarcaDto marcaDto){
         validarMarcaExistente(marcaDto.getNome());
 
-        var novaMarca = marcaDtoMapper.map(marcaDto);
-        return marcaDtoMapper.map(marcaRepository.save(novaMarca));
+        var novaMarca = marcaDtoMapper.converterParaEntidade(marcaDto);
+        return marcaDtoMapper.converterParaDto(marcaRepository.save(novaMarca));
     }
 
     /**
@@ -79,22 +59,9 @@ public class MarcaService {
     public MarcaDto alterarMarca(Long id, MarcaDto marcaDto) {
         validarMarcaExistente(marcaDto.getNome());
 
-        var marcaEncontrada = marcaDtoMapper.map(obterMarcaPorId(id));
+        var marcaEncontrada = obterPorId(id);
         marcaEncontrada.setNome(marcaDto.getNome());
-        return marcaDtoMapper.map(marcaRepository.save(marcaEncontrada));
-    }
-
-    /**
-     * Deleta uma marca
-     *
-     * @param id o id da marca a ser deletada
-     * @return a marca que foi deletada do banco de dados
-     */
-    @Transactional
-    public MarcaDto deletarMarca(Long id) {
-        var marcaEncontrada = obterMarcaPorId(id);
-        marcaRepository.deleteById(marcaEncontrada.getId());
-        return marcaEncontrada;
+        return salvar(marcaEncontrada);
     }
 
     /**
