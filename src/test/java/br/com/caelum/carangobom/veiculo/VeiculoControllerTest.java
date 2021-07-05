@@ -1,7 +1,6 @@
 package br.com.caelum.carangobom.veiculo;
 
 import br.com.caelum.carangobom.exception.NotFoundException;
-import br.com.caelum.carangobom.marca.Marca;
 import br.com.caelum.carangobom.marca.MarcaDto;
 import br.com.caelum.carangobom.veiculo.dashboard.SumarioMarcaDto;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +24,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 
 class VeiculoControllerTest {
 
-    public static final String VEICULO_NAO_ENCONTRADO_MENSAGEM = "Veículo não encontrado";
+    public static final String ENTIDADE_NAO_ENCONTRADO_MENSAGEM = "Entidade não encontrada";
 
     private UriComponentsBuilder uriBuilder;
 
@@ -82,7 +81,7 @@ class VeiculoControllerTest {
     @Test
     void deveRetornarNotFoundQuandoTentarBuscarVeiculoComIdInexistente() {
         when(veiculoService.obterPorId(anyLong()))
-                .thenThrow(new NotFoundException(VEICULO_NAO_ENCONTRADO_MENSAGEM));
+                .thenThrow(new NotFoundException(ENTIDADE_NAO_ENCONTRADO_MENSAGEM));
 
         ResponseEntity<VeiculoDto> resposta = veiculoController.obterVeiculoPorId(1L);
         assertEquals(HttpStatus.NOT_FOUND, resposta.getStatusCode());
@@ -122,7 +121,7 @@ class VeiculoControllerTest {
     void naoDeveAlterarVeiculoInexistente() {
         MarcaDto marcaDto = new MarcaDto(1L, "Ford");
         when(veiculoService.alterarVeiculo(anyLong(), any(VeiculoDto.class)))
-                .thenThrow(new NotFoundException(VEICULO_NAO_ENCONTRADO_MENSAGEM));
+                .thenThrow(new NotFoundException(ENTIDADE_NAO_ENCONTRADO_MENSAGEM));
 
         ResponseEntity<VeiculoDto> resposta = veiculoController.alterarVeiculo(1L, new VeiculoDto(1L, "KA", 2008, 16.700, marcaDto.getNome()));
         assertEquals(HttpStatus.NOT_FOUND, resposta.getStatusCode());
@@ -147,7 +146,7 @@ class VeiculoControllerTest {
     @Test
     void deveDarErroAoTentarDeletarVeiculoInexistente() {
         when(veiculoService.deletar(anyLong()))
-                .thenThrow(new NotFoundException(VEICULO_NAO_ENCONTRADO_MENSAGEM));
+                .thenThrow(new NotFoundException(ENTIDADE_NAO_ENCONTRADO_MENSAGEM));
 
         ResponseEntity<VeiculoDto> resposta = veiculoController.deletarVeiculo(1L);
         assertEquals(HttpStatus.NOT_FOUND, resposta.getStatusCode());

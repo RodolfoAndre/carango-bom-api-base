@@ -46,7 +46,7 @@ public class UsuarioService extends GenericCRUDService<Usuario, UsuarioDto> {
     /**
      * Altera uma usuario
      *
-     * @param id o id da usuario a ser alterada
+     * @param id o id da usuaria a ser alterada
      * @param usuarioDto os novos valores da usuario
      * @return a usuario alterada no banco de dados
      */
