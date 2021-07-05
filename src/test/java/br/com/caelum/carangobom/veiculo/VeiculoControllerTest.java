@@ -3,6 +3,7 @@ package br.com.caelum.carangobom.veiculo;
 import br.com.caelum.carangobom.exception.NotFoundException;
 import br.com.caelum.carangobom.marca.Marca;
 import br.com.caelum.carangobom.marca.MarcaDto;
+import br.com.caelum.carangobom.veiculo.dashboard.SumarioMarcaDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -10,7 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -50,7 +54,7 @@ class VeiculoControllerTest {
                 new VeiculoDto(2L, "Corsa", 2008, 15.000, marcas.get(1).getNome())
         );
 
-        when(veiculoService.listarVeiculos())
+        when(veiculoService.listar())
                 .thenReturn(veiculos);
 
         ResponseEntity<List<VeiculoDto>> resultado = veiculoController.listarVeiculos();
@@ -67,7 +71,7 @@ class VeiculoControllerTest {
 
         VeiculoDto veiculo = new VeiculoDto(1L, "KA", 2008, 15.000, marcas.get(0).getNome());
 
-        when(veiculoService.obterVeiculoPorId(1L))
+        when(veiculoService.obterPorId(1L))
                 .thenReturn(veiculo);
 
         ResponseEntity<VeiculoDto> resposta = veiculoController.obterVeiculoPorId(1L);
@@ -77,7 +81,7 @@ class VeiculoControllerTest {
 
     @Test
     void deveRetornarNotFoundQuandoTentarBuscarVeiculoComIdInexistente() {
-        when(veiculoService.obterVeiculoPorId(anyLong()))
+        when(veiculoService.obterPorId(anyLong()))
                 .thenThrow(new NotFoundException(VEICULO_NAO_ENCONTRADO_MENSAGEM));
 
         ResponseEntity<VeiculoDto> resposta = veiculoController.obterVeiculoPorId(1L);
@@ -132,20 +136,36 @@ class VeiculoControllerTest {
 
         VeiculoDto veiculo = new VeiculoDto(1L, "KA", 2008, 15.000, marcas.get(0).getNome());
 
-        when(veiculoService.obterVeiculoPorId(1L))
+        when(veiculoService.obterPorId(1L))
                 .thenReturn(veiculo);
 
         ResponseEntity<VeiculoDto> resposta = veiculoController.deletarVeiculo(1L);
         assertEquals(HttpStatus.OK, resposta.getStatusCode());
-        verify(veiculoService).deletarVeiculo(veiculo.getId());
+        verify(veiculoService).deletar(veiculo.getId());
     }
 
     @Test
     void deveDarErroAoTentarDeletarVeiculoInexistente() {
-        when(veiculoService.deletarVeiculo(anyLong()))
+        when(veiculoService.deletar(anyLong()))
                 .thenThrow(new NotFoundException(VEICULO_NAO_ENCONTRADO_MENSAGEM));
 
         ResponseEntity<VeiculoDto> resposta = veiculoController.deletarVeiculo(1L);
         assertEquals(HttpStatus.NOT_FOUND, resposta.getStatusCode());
+    }
+
+    @Test
+    void deveRetornarObjetosFiltrados() {
+        VeiculoFiltroDto veiculoFiltroDto = new VeiculoFiltroDto();
+        when(veiculoService.filtrarVeiculos(veiculoFiltroDto)).thenReturn(new ArrayList<>());
+
+        ResponseEntity<List<VeiculoDto>> resposta = veiculoController.filtrarVeiculos(veiculoFiltroDto);
+        assertEquals(HttpStatus.OK, resposta.getStatusCode());
+    }
+
+    @Test
+    void deveRetornarDashboard() {
+        when(veiculoService.dashboard()).thenReturn(new HashSet<>());
+        ResponseEntity<Set<SumarioMarcaDto>> resposta = veiculoController.dashboard();
+        assertEquals(HttpStatus.OK, resposta.getStatusCode());
     }
 }

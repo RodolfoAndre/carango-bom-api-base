@@ -1,15 +1,24 @@
 package br.com.caelum.carangobom.veiculo;
 
-import br.com.caelum.carangobom.exception.ConflictException;
 import br.com.caelum.carangobom.exception.NotFoundException;
 import br.com.caelum.carangobom.marca.*;
+import br.com.caelum.carangobom.shared.filtro.SpecificationFactory;
+import br.com.caelum.carangobom.veiculo.dashboard.SumarioMarcaDto;
+import br.com.caelum.carangobom.veiculo.dashboard.SumarioModeloDto;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,7 +29,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 
 class VeiculoServiceTest {
 
-    public static final String VEICULO_NAO_ENCONTRADO_MENSAGEM = "Veículo não encontrado";
+    public static final String ENTIDADE_NAO_ENCONTRADA_MENSAGEM = "Entidade não encontrada";
     public static final String MARCA_NAO_ENCONTRADA_MENSAGEM = "Marca informada não encontrada";
 
     @Mock
@@ -38,7 +47,8 @@ class VeiculoServiceTest {
         openMocks(this);
 
         veiculoDtoMapper = new VeiculoDtoMapper();
-        veiculoService = new VeiculoService(veiculoRepository, marcaRepository, veiculoDtoMapper);
+        SpecificationFactory<Veiculo> veiculoSpecificationFactory = new SpecificationFactory<Veiculo>();
+        veiculoService = new VeiculoService(veiculoRepository, marcaRepository, veiculoDtoMapper, veiculoSpecificationFactory);
     }
 
     @Test
@@ -53,12 +63,12 @@ class VeiculoServiceTest {
                 new Veiculo(2L, "Corsa", 2008, 15.000, marcas.get(1))
         );
 
-        List<VeiculoDto> veiculosEsperados = veiculos.stream().map(veiculoDtoMapper::map).collect(Collectors.toList());
+        List<VeiculoDto> veiculosEsperados = veiculos.stream().map(veiculoDtoMapper::converterParaDto).collect(Collectors.toList());
 
-        when(veiculoRepository.findAllByOrderByModelo())
+        when(veiculoRepository.findAll())
                 .thenReturn(veiculos);
 
-        var veiculosRetornados = veiculoService.listarVeiculos();
+        var veiculosRetornados = veiculoService.listar();
 
         assertNotNull(veiculosRetornados);
         assertEquals(veiculosEsperados, veiculosRetornados);
@@ -70,7 +80,7 @@ class VeiculoServiceTest {
 
         doReturn(veiculos).when(veiculoRepository).findAllByOrderByModelo();
 
-        var veiculosRetornados = veiculoService.listarVeiculos();
+        var veiculosRetornados = veiculoService.listar();
 
         assertNotNull(veiculosRetornados);
         assertEquals(veiculos, veiculosRetornados);
@@ -86,12 +96,12 @@ class VeiculoServiceTest {
                 new Veiculo(1L, "KA", 2008, 15.000, marcas.get(0))
         );
 
-        var veiculoEsperado = veiculoDtoMapper.map(veiculo.get());
+        var veiculoEsperado = veiculoDtoMapper.converterParaDto(veiculo.get());
 
         when(veiculoRepository.findById(1L))
                 .thenReturn(veiculo);
 
-        var veiculosRetornados = veiculoService.obterVeiculoPorId(1L);
+        var veiculosRetornados = veiculoService.obterPorId(1L);
 
         assertNotNull(veiculosRetornados);
         assertEquals(veiculoEsperado, veiculosRetornados);
@@ -105,10 +115,10 @@ class VeiculoServiceTest {
                 .thenReturn(veiculos);
 
         Exception exception = assertThrows(NotFoundException.class, () -> {
-            veiculoService.obterVeiculoPorId(2L);
+            veiculoService.obterPorId(2L);
         });
 
-        String expectedMessage = VEICULO_NAO_ENCONTRADO_MENSAGEM;
+        String expectedMessage = ENTIDADE_NAO_ENCONTRADA_MENSAGEM;
         String actualMessage = exception.getMessage();
 
         assertEquals(expectedMessage, actualMessage);
@@ -200,13 +210,12 @@ class VeiculoServiceTest {
                 .thenReturn(veiculos);
 
         Exception exception = assertThrows(NotFoundException.class, () -> {
-            veiculoService.deletarVeiculo(2L);
+            veiculoService.deletar(2L);
         });
 
-        String expectedMessage = VEICULO_NAO_ENCONTRADO_MENSAGEM;
         String actualMessage = exception.getMessage();
 
-        assertEquals(expectedMessage, actualMessage);
+        assertEquals(ENTIDADE_NAO_ENCONTRADA_MENSAGEM, actualMessage);
     }
 
     @Test
@@ -222,8 +231,70 @@ class VeiculoServiceTest {
         when(veiculoRepository.findById(1L))
                 .thenReturn(veiculos);
 
-        var veiculoDeletado = veiculoService.deletarVeiculo(1L);
+        var veiculoDeletado = veiculoService.deletar(1L);
 
         assertEquals(veiculos.get().getModelo(), veiculoDeletado.getModelo());
+    }
+
+    @Test
+    void deveRetornarVeiculosAoFiltrarVeiculos() {
+        VeiculoFiltroDto filtroDto = new VeiculoFiltroDto();
+        filtroDto.setMarcas(Set.of("Ferrai", "Ford"));
+        filtroDto.setModelos(Set.of("488", "KA"));
+        filtroDto.setPrecoMaximo(10000D);
+        filtroDto.setPrecoMinimo(15000D);
+
+        Veiculo veiculo = new Veiculo(1L, "KA", 2020, 18000D);
+        veiculo.setMarca(new Marca("Ford"));
+        List<Veiculo> veiculos = Collections.singletonList(veiculo);
+        when(veiculoRepository.findAll(any(Specification.class), any(Sort.class)))
+                .thenReturn(veiculos);
+
+        var veiculosFiltrados = veiculoService.filtrarVeiculos(filtroDto);
+
+        assertEquals(veiculos.size(), veiculosFiltrados.size());
+    }
+
+    @Test
+    void deveRetornarSumarioNaRecuperacaoDeDashboard() {
+        VeiculoFiltroDto filtroDto = new VeiculoFiltroDto();
+        filtroDto.setMarcas(Set.of("Ferrai", "Ford"));
+        filtroDto.setModelos(Set.of("488", "KA"));
+        filtroDto.setPrecoMaximo(10000D);
+        filtroDto.setPrecoMinimo(15000D);
+
+        Veiculo veiculo0 = new Veiculo(1L, "KA", 2019, 18000D);
+        veiculo0.setMarca(new Marca("Ford"));
+
+        Veiculo veiculo1 = new Veiculo(1L, "KA", 2020, 22000D);
+        veiculo1.setMarca(new Marca("Ford"));
+
+        Veiculo veiculo2 = new Veiculo(1L, "Fiesta", 2020, 50000D);
+        veiculo2.setMarca(new Marca("Ford"));
+
+        List<Veiculo> veiculos = Arrays.asList(veiculo0, veiculo1, veiculo2);
+        when(veiculoRepository.findAll()).thenReturn(veiculos);
+
+        var dashboard = veiculoService.dashboard();
+
+        Assertions.assertNotNull(dashboard);
+        Assertions.assertFalse(CollectionUtils.isEmpty(dashboard));
+        for (SumarioMarcaDto sumarioMarcaDto : dashboard) {
+            Assertions.assertEquals("Ford", sumarioMarcaDto.getMarca());
+            Assertions.assertEquals(90000, sumarioMarcaDto.getValorTotal());
+            Assertions.assertEquals(3, sumarioMarcaDto.getNumeroDeVeiculos());
+
+            for (SumarioModeloDto modelo : sumarioMarcaDto.getModelos()) {
+                if (modelo.getModelo().equals("KA")){
+                    Assertions.assertEquals(2, modelo.getNumeroDeVeiculos());
+                    Assertions.assertEquals(40000, modelo.getValorTotal());
+                } else if (modelo.getModelo().equals("Fiesta")) {
+                    Assertions.assertEquals(1, modelo.getNumeroDeVeiculos());
+                    Assertions.assertEquals(50000, modelo.getValorTotal());
+                } else {
+                    Assertions.fail();
+                }
+            }
+        }
     }
 }

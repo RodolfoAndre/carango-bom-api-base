@@ -1,15 +1,13 @@
 package br.com.caelum.carangobom.veiculo;
 
 import br.com.caelum.carangobom.marca.Marca;
-import br.com.caelum.carangobom.marca.MarcaRepository;
+import br.com.caelum.carangobom.shared.estrutura.BasicEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-
-import java.util.Optional;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -18,21 +16,28 @@ import static javax.persistence.GenerationType.IDENTITY;
  */
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
-public class Veiculo {
+public class Veiculo implements BasicEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
+
     private String modelo;
+
     private Integer ano;
+
     private Double valor;
+
     @ManyToOne
     private Marca marca;
 
-    public Veiculo(String modelo, Integer ano, Double valor, Marca marca) {
-        this(null, modelo, ano, valor, marca);
+    public Veiculo(Long id, String modelo, Integer ano, Double valor) {
+        this.id = id;
+        this.modelo = modelo;
+        this.ano = ano;
+        this.valor = valor;
     }
 }

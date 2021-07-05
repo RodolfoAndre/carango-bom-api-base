@@ -1,5 +1,6 @@
 package br.com.caelum.carangobom.marca;
 
+import br.com.caelum.carangobom.shared.estrutura.BasicEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +20,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Marca {
+public class Marca implements BasicEntity {
 
     @Id @GeneratedValue(strategy = IDENTITY)
     private Long id;

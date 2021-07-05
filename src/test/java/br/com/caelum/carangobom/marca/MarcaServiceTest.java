@@ -2,7 +2,6 @@ package br.com.caelum.carangobom.marca;
 
 import br.com.caelum.carangobom.exception.ConflictException;
 import br.com.caelum.carangobom.exception.NotFoundException;
-import br.com.caelum.carangobom.veiculo.Veiculo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -22,7 +21,7 @@ class MarcaServiceTest {
 
     public static final String MARCA_FERRARI = "Ferrari";
     public static final String MARCA_AUDI = "Audi";
-    public static final String MARCA_NAO_ENCONTRADA_MENSAGEM = "Marca não encontrada";
+    public static final String ENTIDADE_NAO_ENCONTRADA_MENSAGEM = "Entidade não encontrada";
 
     @Mock
     private MarcaRepository marcaRepository;
@@ -46,12 +45,12 @@ class MarcaServiceTest {
                 new Marca(2L, "BMW"),
                 new Marca(3L, "Fiat")
         );
-        List<MarcaDto> marcasEsperadas = marcas.stream().map(marcaDtoMapper::map).collect(Collectors.toList());
+        List<MarcaDto> marcasEsperadas = marcas.stream().map(marcaDtoMapper::converterParaDto).collect(Collectors.toList());
 
-        when(marcaRepository.findAllByOrderByNome())
+        when(marcaRepository.findAll())
                 .thenReturn(marcas);
 
-        var marcasRetornadas = marcaService.listarMarcas();
+        var marcasRetornadas = marcaService.listar();
 
         assertNotNull(marcasRetornadas);
         assertEquals(marcasEsperadas, marcasRetornadas);
@@ -63,7 +62,7 @@ class MarcaServiceTest {
 
         doReturn(marcas).when(marcaRepository).findAllByOrderByNome();
 
-        var marcasRetornadas = marcaService.listarMarcas();
+        var marcasRetornadas = marcaService.listar();
 
         assertNotNull(marcasRetornadas);
         assertEquals(marcas, marcasRetornadas);
@@ -74,12 +73,12 @@ class MarcaServiceTest {
         Optional<Marca> marca = Optional.of(
                 new Marca(1L, MARCA_AUDI)
         );
-        var marcaEsperada = marcaDtoMapper.map(marca.get());
+        var marcaEsperada = marcaDtoMapper.converterParaDto(marca.get());
 
         when(marcaRepository.findById(1L))
                 .thenReturn(marca);
 
-        var marcasRetornadas = marcaService.obterMarcaPorId(1L);
+        var marcasRetornadas = marcaService.obterPorId(1L);
 
         assertNotNull(marcasRetornadas);
         assertEquals(marcaEsperada, marcasRetornadas);
@@ -93,12 +92,12 @@ class MarcaServiceTest {
                 .thenReturn(marcas);
 
         Exception exception = assertThrows(NotFoundException.class, () -> {
-            marcaService.obterMarcaPorId(2L);
+            marcaService.obterPorId(2L);
         });
 
         String actualMessage = exception.getMessage();
 
-        assertEquals(MARCA_NAO_ENCONTRADA_MENSAGEM, actualMessage);
+        assertEquals(ENTIDADE_NAO_ENCONTRADA_MENSAGEM, actualMessage);
     }
 
     @Test
@@ -173,7 +172,7 @@ class MarcaServiceTest {
 
         String actualMessage = exception.getMessage();
 
-        assertEquals(MARCA_NAO_ENCONTRADA_MENSAGEM, actualMessage);
+        assertEquals(ENTIDADE_NAO_ENCONTRADA_MENSAGEM, actualMessage);
     }
 
     @Test
@@ -206,12 +205,12 @@ class MarcaServiceTest {
                 .thenReturn(marcas);
 
         Exception exception = assertThrows(NotFoundException.class, () -> {
-            marcaService.deletarMarca(2L);
+            marcaService.deletar(2L);
         });
 
         String actualMessage = exception.getMessage();
 
-        assertEquals(MARCA_NAO_ENCONTRADA_MENSAGEM, actualMessage);
+        assertEquals(ENTIDADE_NAO_ENCONTRADA_MENSAGEM, actualMessage);
     }
 
     @Test
@@ -223,7 +222,7 @@ class MarcaServiceTest {
         when(marcaRepository.findById(1L))
                 .thenReturn(marcas);
 
-        var marcaDeletada = marcaService.deletarMarca(1L);
+        var marcaDeletada = marcaService.deletar(1L);
 
         assertEquals(marcas.get().getNome(), marcaDeletada.getNome());
     }
