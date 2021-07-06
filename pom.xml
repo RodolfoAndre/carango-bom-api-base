@@ -17,6 +17,9 @@
 	<properties>
 		<java.version>11</java.version>
 		<surefire.skip>false</surefire.skip>
+		<sonar.projectKey>RodolfoAndre_carango-bom-api-base</sonar.projectKey>
+		<sonar.organization>rodolfoandre</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
 
 	<dependencies>
