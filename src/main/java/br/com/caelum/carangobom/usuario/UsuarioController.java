@@ -22,7 +22,6 @@ import java.util.List;
 /**
  * Classe reponsável pelo controller de usuario.
  */
-@CrossOrigin
 @Controller
 @RequestMapping("/usuarios")
 public class UsuarioController extends GenericController {
