@@ -15,7 +15,6 @@ import java.util.List;
 /**
  * Classe reponsável pelo controller de marca.
  */
-@CrossOrigin
 @Controller
 @RequestMapping("/marcas")
 public class MarcaController extends GenericController {

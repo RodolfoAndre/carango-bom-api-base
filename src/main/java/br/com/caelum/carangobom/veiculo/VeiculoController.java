@@ -14,7 +14,6 @@ import java.util.Set;
 /**
  * Classe reponsável pelo controller de veículo.
  */
-@CrossOrigin
 @Controller
 @RequestMapping("/veiculos")
 public class VeiculoController extends GenericController {
