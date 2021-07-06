@@ -46,7 +46,7 @@ public class UsuarioService extends GenericCRUDService<Usuario, UsuarioDto> {
     /**
      * Altera uma usuario
      *
-     * @param id o id da usuario a ser alterada
+     * @param id o id da usuaria a ser alterada
      * @param usuarioDto os novos valores da usuario
      * @return a usuario alterada no banco de dados
      */
@@ -65,6 +65,6 @@ public class UsuarioService extends GenericCRUDService<Usuario, UsuarioDto> {
      */
     private void validarUsuarioExistente(String nomeUsuario) {
         Optional<Usuario> usuarioEncontrada = usuarioRepository.findByNome(nomeUsuario);
-        usuarioEncontrada.ifPresent(m ->{ throw new ConflictException("usuario " + m.getNome()+ " já existente");});
+        usuarioEncontrada.ifPresent(m ->{ throw new ConflictException("Usuario " + m.getNome()+ " já existente");});
     }
 }

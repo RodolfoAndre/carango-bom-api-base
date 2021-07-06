@@ -18,4 +18,10 @@ public class UsuarioDto extends BasicEntityDto {
         super.id = id;
         this.nome = nome;
     }
+
+    public UsuarioDto(Long id, String nome, String senha) {
+        super.id = id;
+        this.nome = nome;
+        this.senha = senha;
+    }
 }
