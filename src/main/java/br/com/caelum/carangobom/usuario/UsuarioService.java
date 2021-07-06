@@ -65,6 +65,6 @@ public class UsuarioService extends GenericCRUDService<Usuario, UsuarioDto> {
      */
     private void validarUsuarioExistente(String nomeUsuario) {
         Optional<Usuario> usuarioEncontrada = usuarioRepository.findByNome(nomeUsuario);
-        usuarioEncontrada.ifPresent(m ->{ throw new ConflictException("usuario " + m.getNome()+ " já existente");});
+        usuarioEncontrada.ifPresent(m ->{ throw new ConflictException("Usuario " + m.getNome()+ " já existente");});
     }
 }
