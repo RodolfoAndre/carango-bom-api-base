@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 /**
  * Classe genérica de controller
  */
-public abstract class GenericController {
+public interface GenericController {
 
     /**
      * Encapsula o resultado da função em uma {@link ResponseEntity} Ok(200). Se ocorrer alguma exceção {@link NotFoundException}
@@ -28,7 +28,7 @@ public abstract class GenericController {
      * @return {@link ResponseEntity} com o resultado da requisição. Caso ocorra tudo como esperado, deverá retornar
      * com "status code" 200 (ok), caso não seja, retornará "status code" 404 (not found).
      */
-    public <T> ResponseEntity<T> encapsulaResultadoOk(Supplier<T> funcao) {
+    default <T> ResponseEntity<T> encapsulaResultadoOk(Supplier<T> funcao) {
         try {
             return ResponseEntity.ok(funcao.get());
         } catch (NotFoundException notFoundException) {
@@ -44,7 +44,7 @@ public abstract class GenericController {
      * @return {@link ResponseEntity} com o resultado da requisição. Caso ocorra tudo como esperado, deverá retornar
      * com "status code" 200 (ok), caso não seja, retornará "status code" 404 (not found).
      */
-    public <T extends BasicEntityDto> ResponseEntity<T> encapsularResultadoCreated(Supplier<T> funcao, UriComponentsBuilder uriBuilder, String url) {
+    default <T extends BasicEntityDto> ResponseEntity<T> encapsularResultadoCreated(Supplier<T> funcao, UriComponentsBuilder uriBuilder, String url) {
         try {
             var resultado = funcao.get();
             var uri = uriBuilder.path(url).buildAndExpand(resultado.getId()).toUri();
@@ -62,7 +62,7 @@ public abstract class GenericController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseBody
-    public ListaDeErrosOutputDto validarParametrosRequisicao(MethodArgumentNotValidException excecao) {
+    default ListaDeErrosOutputDto validarParametrosRequisicao(MethodArgumentNotValidException excecao) {
         var listaDeErrosOutput = new ListaDeErrosOutputDto();
 
         var listaDeErro = montarListaDeErros(excecao);

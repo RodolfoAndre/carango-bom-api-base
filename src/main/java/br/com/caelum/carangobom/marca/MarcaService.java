@@ -1,15 +1,11 @@
 package br.com.caelum.carangobom.marca;
 
 import br.com.caelum.carangobom.exception.ConflictException;
-import br.com.caelum.carangobom.exception.NotFoundException;
 import br.com.caelum.carangobom.shared.estrutura.GenericCRUDService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Classe responsável pela lógica de negócios de marcas
@@ -71,6 +67,6 @@ public class MarcaService extends GenericCRUDService<Marca, MarcaDto> {
      */
     private void validarMarcaExistente(String nomeMarca) {
         Optional<Marca> marcaEncontrada = marcaRepository.findByNome(nomeMarca);
-        marcaEncontrada.ifPresent((m) ->{ throw new ConflictException("Marca " + m.getNome()+ " já existente");});
+        marcaEncontrada.ifPresent(m ->{ throw new ConflictException("Marca " + m.getNome()+ " já existente");});
     }
 }

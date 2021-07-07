@@ -1,6 +1,5 @@
 package br.com.caelum.carangobom.veiculo.dashboard;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 

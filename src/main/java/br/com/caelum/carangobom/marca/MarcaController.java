@@ -17,7 +17,7 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("/marcas")
-public class MarcaController extends GenericController {
+public class MarcaController implements GenericController {
 
     private final MarcaService marcaService;
 

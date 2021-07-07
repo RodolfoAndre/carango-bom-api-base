@@ -20,7 +20,7 @@ public class SpecificationFactory<T> {
      * @param arg o valor que o resultado deve trazer maior que
      * @return a especificação dessa operação
      */
-    public Specification<T> isGreaterThan(String key, Comparable arg) {
+    public Specification<T> isGreaterThan(String key, Comparable<Double> arg) {
         GenericSpecificationsBuilder<T> builder = new GenericSpecificationsBuilder<>();
         return builder.with(key, SearchCriteria.SearchOperation.GREATER_THAN, Collections.singletonList(arg)).build();
     }
@@ -32,7 +32,7 @@ public class SpecificationFactory<T> {
      * @param arg o valor que o resultado deve trazer menor que
      * @return a especificação dessa operação
      */
-    public Specification<T> isLessThan(String key, Comparable arg) {
+    public Specification<T> isLessThan(String key, Comparable<Double> arg) {
         GenericSpecificationsBuilder<T> builder = new GenericSpecificationsBuilder<>();
         return builder.with(key, SearchCriteria.SearchOperation.LESS_THAN, Collections.singletonList(arg)).build();
     }
