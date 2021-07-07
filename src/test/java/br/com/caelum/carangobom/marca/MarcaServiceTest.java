@@ -148,8 +148,10 @@ class MarcaServiceTest {
         when(marcaRepository.findByNome(marca.getNome()))
                 .thenReturn(marcaCadastrada);
 
+        Long id = marca.getId();
+
         Exception exception = assertThrows(ConflictException.class, () -> {
-            marcaService.alterarMarca(marca.getId(), marca);
+            marcaService.alterarMarca(id, marca);
         });
 
         String expectedMessage = "Marca " + marcaCadastrada.get().getNome()+ " já existente";

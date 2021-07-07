@@ -4,6 +4,7 @@ import br.com.caelum.carangobom.usuario.Usuario;
 import br.com.caelum.carangobom.usuario.UsuarioDto;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.security.Key;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,8 +28,11 @@ public class TokenService {
     @Value("${carangobom.jwt.expiration}")
     private Long expiration;
 
-    @Value("${carangobom.jwt.secret}")
-    private String secret;
+    private Key secret;
+
+    public TokenService(){
+        this.secret = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    }
 
     /**
      * Gera um token a partir de uma autenticação de usuário
@@ -39,7 +44,7 @@ public class TokenService {
         var usuario = (Usuario) authentication.getPrincipal();
         var hoje = new Date();
         var expiracao = new Date(hoje.getTime() + expiration);
-        return Jwts.builder().setIssuer("Carango Bom").setSubject(usuario.getId().toString()).setIssuedAt(hoje).setExpiration(expiracao).signWith(SignatureAlgorithm.HS256, secret).compact();
+        return Jwts.builder().setIssuer("Carango Bom").setSubject(usuario.getId().toString()).setIssuedAt(hoje).setExpiration(expiracao).signWith(secret).compact();
     }
 
     /**

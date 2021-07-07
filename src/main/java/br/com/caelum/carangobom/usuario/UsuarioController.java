@@ -23,7 +23,7 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("/usuarios")
-public class UsuarioController extends GenericController {
+public class UsuarioController implements GenericController {
 
     private final UsuarioService usuarioService;
 

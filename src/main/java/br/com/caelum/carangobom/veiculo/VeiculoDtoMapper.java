@@ -1,6 +1,5 @@
 package br.com.caelum.carangobom.veiculo;
 
-import br.com.caelum.carangobom.marca.Marca;
 import br.com.caelum.carangobom.shared.estrutura.ObjectMappeable;
 import org.springframework.stereotype.Component;
 

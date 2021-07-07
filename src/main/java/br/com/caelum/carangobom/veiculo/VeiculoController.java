@@ -16,7 +16,7 @@ import java.util.Set;
  */
 @Controller
 @RequestMapping("/veiculos")
-public class VeiculoController extends GenericController {
+public class VeiculoController implements GenericController {
 
     private final VeiculoService veiculoService;
 

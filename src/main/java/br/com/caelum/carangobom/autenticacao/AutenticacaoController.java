@@ -15,7 +15,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/auth")
-public class AutenticacaoController extends GenericController {
+public class AutenticacaoController implements GenericController {
 
     @Autowired
     private TokenService tokenService;
