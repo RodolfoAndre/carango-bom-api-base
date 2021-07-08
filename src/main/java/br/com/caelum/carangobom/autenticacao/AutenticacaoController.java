@@ -17,8 +17,12 @@ import javax.validation.Valid;
 @RequestMapping("/auth")
 public class AutenticacaoController implements GenericController {
 
+    private final TokenService tokenService;
+
     @Autowired
-    private TokenService tokenService;
+    public AutenticacaoController(TokenService tokenService){
+        this.tokenService = tokenService;
+    }
 
     @PostMapping
     public ResponseEntity<AutenticacaoTokenDto> autenticar(@RequestBody @Valid UsuarioDto usuarioDto) {
