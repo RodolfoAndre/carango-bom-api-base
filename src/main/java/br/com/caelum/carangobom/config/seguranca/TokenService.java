@@ -23,15 +23,16 @@ public class TokenService {
 
     private static final Logger logger = Logger.getLogger(TokenService.class.getName());
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
+
+    private final Key secret;
 
     @Value("${carangobom.jwt.expiration}")
     private Long expiration;
 
-    private Key secret;
-
-    public TokenService(){
+    @Autowired
+    public TokenService(AuthenticationManager authenticationManager){
+        this.authenticationManager = authenticationManager;
         this.secret = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     }
 
