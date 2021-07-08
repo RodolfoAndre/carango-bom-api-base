@@ -57,15 +57,4 @@ public class VeiculoDto extends BasicEntityDto {
     public int hashCode() {
         return Objects.hash(modelo);
     }
-
-    @Override
-    public String toString() {
-        return "VeiculoDto{" +
-                "modelo='" + modelo + '\'' +
-                ", marca=" + marca +
-                ", ano='" + ano + '\'' +
-                ", valor='" + valor + '\'' +
-                ", id=" + id +
-                '}';
-    }
 }

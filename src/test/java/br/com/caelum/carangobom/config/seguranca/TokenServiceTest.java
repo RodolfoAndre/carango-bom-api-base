@@ -94,7 +94,7 @@ class TokenServiceTest {
     }
 
     @Test
-    void deveRetornarNullCasoNãoTenhaToken() {
+    void deveRetornarNullCasoNaoTenhaToken() {
         HttpServletRequest httpServletRequest = Mockito.mock(HttpServletRequest.class);
         Mockito.when(httpServletRequest.getHeader("Authorization")).thenReturn("token.de.teste");
 
@@ -111,8 +111,7 @@ class TokenServiceTest {
         Mockito.when(authenticationManager.authenticate(dadosLogin)).thenReturn(authentication);
         Mockito.when(authentication.getPrincipal()).thenReturn(usuario);
 
-        AutenticacaoTokenDto tokenDto = tokenService.gerarToken(usuarioDto);
-        return tokenDto;
+        return tokenService.gerarToken(usuarioDto);
     }
 
 }
