@@ -2,6 +2,7 @@ package br.com.caelum.carangobom.config.seguranca;
 
 import br.com.caelum.carangobom.usuario.Usuario;
 import br.com.caelum.carangobom.usuario.UsuarioDto;
+import br.com.caelum.carangobom.usuario.UsuarioRepository;
 import br.com.caelum.carangobom.veiculo.VeiculoController;
 import br.com.caelum.carangobom.veiculo.VeiculoService;
 import io.jsonwebtoken.Jwts;
@@ -21,6 +22,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.Optional;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -37,23 +40,29 @@ class SegurancaWebTest {
     @Autowired
     private TokenService tokenService;
 
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
     @BeforeEach
-    public void configuraMock() {
+    public void preSetup() {
         openMocks(this);
+
+        Usuario usuarioLogado = new Usuario(1L, "admin", "admin", null);
+        usuarioRepository.save(usuarioLogado);
     }
 
     private String getToken() {
-
-        Usuario usuarioLogado = new Usuario(1L, "admin", "adminz", null);
         AuthenticationManager authenticationManager = Mockito.mock(AuthenticationManager.class);
         Authentication authentication = Mockito.mock(Authentication.class);
 
         Mockito.when(authenticationManager.authenticate(any())).thenReturn(authentication);
-        Mockito.when(authentication.getPrincipal()).thenReturn(usuarioLogado);
+        Optional<Usuario> usuarioLogado = usuarioRepository.findById(1L);
+        Mockito.when(authentication.getPrincipal()).thenReturn(usuarioLogado.orElse(null));
 
         UsuarioDto usuarioDto = new UsuarioDto(1L, "admin", "admin");
         ReflectionTestUtils.setField(tokenService, "expiration", 1800000L);
         ReflectionTestUtils.setField(tokenService, "authenticationManager", authenticationManager);
+
         var tokenDto = tokenService.gerarToken(usuarioDto);
         return tokenDto.getTipo()+ " " + tokenDto.getToken();
     }
@@ -63,10 +72,8 @@ class SegurancaWebTest {
         var mvcResult = this.mockMvc.perform(get("/veiculos").header(HttpHeaders.AUTHORIZATION, ""))
                 .andDo(print()).andReturn();
 
-        Assertions.assertEquals("application/json",
-                mvcResult.getResponse().getContentType());
-        Assertions.assertEquals(HttpStatus.SC_OK,
-                mvcResult.getResponse().getStatus());
+        Assertions.assertEquals("application/json", mvcResult.getResponse().getContentType());
+        Assertions.assertEquals(HttpStatus.SC_OK, mvcResult.getResponse().getStatus());
     }
 
     @Test
