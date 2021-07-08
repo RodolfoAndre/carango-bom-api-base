@@ -7,6 +7,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -31,7 +32,7 @@ public class TokenService {
     private Long expiration;
 
     @Autowired
-    public TokenService(AuthenticationManager authenticationManager){
+    public TokenService(@Lazy AuthenticationManager authenticationManager){
         this.authenticationManager = authenticationManager;
         this.secret = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     }

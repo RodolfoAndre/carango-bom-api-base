@@ -12,9 +12,13 @@ import java.util.Optional;
 
 @Service
 public class AutenticacaoService implements UserDetailsService {
-	
-	@Autowired
+
 	private UsuarioRepository repository;
+
+	@Autowired
+	public AutenticacaoService(UsuarioRepository repository){
+		this.repository = repository;
+	}
 
 	@Override
 	public UserDetails loadUserByUsername(String nome) throws UsernameNotFoundException {
