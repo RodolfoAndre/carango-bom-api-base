@@ -49,7 +49,7 @@ public class VeiculoDto extends BasicEntityDto {
         if (that == null || getClass() != that.getClass()) {
             return false;
         }
-        VeiculoDto veiculoDto = (VeiculoDto) that;
+        var veiculoDto = (VeiculoDto) that;
         return Objects.equals(modelo, veiculoDto.modelo);
     }
 

@@ -1,6 +1,7 @@
 package br.com.caelum.carangobom.marca;
 
 import br.com.caelum.carangobom.exception.ConflictException;
+import br.com.caelum.carangobom.exception.MensagensExcecoes;
 import br.com.caelum.carangobom.exception.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,6 @@ class MarcaServiceTest {
 
     public static final String MARCA_FERRARI = "Ferrari";
     public static final String MARCA_AUDI = "Audi";
-    public static final String ENTIDADE_NAO_ENCONTRADA_MENSAGEM = "Entidade não encontrada";
 
     @Mock
     private MarcaRepository marcaRepository;
@@ -97,7 +97,7 @@ class MarcaServiceTest {
 
         String actualMessage = exception.getMessage();
 
-        assertEquals(ENTIDADE_NAO_ENCONTRADA_MENSAGEM, actualMessage);
+        assertEquals(MensagensExcecoes.ENTIDADE_NAO_ENCONTRADO_MENSAGEM, actualMessage);
     }
 
     @Test
@@ -115,7 +115,7 @@ class MarcaServiceTest {
             marcaService.cadastrarMarca(marca);
         });
 
-        String expectedMessage = "Marca " + marcaCadastrada.get().getNome()+ " já existente";
+        String expectedMessage = String.format(MensagensExcecoes.ENTIDADE_EXISTENTE_FORMATO_MENSAGEM, Marca.class.getSimpleName(), marcaCadastrada.get().getNome());
         String actualMessage = exception.getMessage();
 
         assertEquals(expectedMessage, actualMessage);
@@ -154,7 +154,7 @@ class MarcaServiceTest {
             marcaService.alterarMarca(id, marca);
         });
 
-        String expectedMessage = "Marca " + marcaCadastrada.get().getNome()+ " já existente";
+        String expectedMessage = String.format(MensagensExcecoes.ENTIDADE_EXISTENTE_FORMATO_MENSAGEM, Marca.class.getSimpleName(), marcaCadastrada.get().getNome());
         String actualMessage = exception.getMessage();
 
         assertEquals(expectedMessage, actualMessage);
@@ -174,7 +174,7 @@ class MarcaServiceTest {
 
         String actualMessage = exception.getMessage();
 
-        assertEquals(ENTIDADE_NAO_ENCONTRADA_MENSAGEM, actualMessage);
+        assertEquals(MensagensExcecoes.ENTIDADE_NAO_ENCONTRADO_MENSAGEM, actualMessage);
     }
 
     @Test
@@ -212,7 +212,7 @@ class MarcaServiceTest {
 
         String actualMessage = exception.getMessage();
 
-        assertEquals(ENTIDADE_NAO_ENCONTRADA_MENSAGEM, actualMessage);
+        assertEquals(MensagensExcecoes.ENTIDADE_NAO_ENCONTRADO_MENSAGEM, actualMessage);
     }
 
     @Test

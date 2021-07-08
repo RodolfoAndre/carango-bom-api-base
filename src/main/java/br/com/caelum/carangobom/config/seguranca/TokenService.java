@@ -12,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.util.Date;
 import java.util.logging.Level;
@@ -22,15 +23,16 @@ public class TokenService {
 
     private static final Logger logger = Logger.getLogger(TokenService.class.getName());
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
+
+    private final Key secret;
 
     @Value("${carangobom.jwt.expiration}")
     private Long expiration;
 
-    private Key secret;
-
-    public TokenService(){
+    @Autowired
+    public TokenService(AuthenticationManager authenticationManager){
+        this.authenticationManager = authenticationManager;
         this.secret = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     }
 
@@ -86,5 +88,35 @@ public class TokenService {
     public Long getIdUsuario(String token) {
         var claims = Jwts.parserBuilder().setSigningKey(secret).build().parseClaimsJws(token).getBody();
         return Long.parseLong(claims.getSubject());
+    }
+
+    /**
+     * Recupera o token pelo request
+     *
+     * @param httpServletRequest a requisição contendo o token
+     * @return o token, caso seja encontrado
+     */
+    public String recuperarToken(HttpServletRequest httpServletRequest) {
+        String result = null;
+        var token = httpServletRequest.getHeader("Authorization");
+        if (!token.isBlank() && token.startsWith("Bearer ")) {
+            result = token.substring(7);
+        }
+        return result;
+    }
+
+    /**
+     * Recupera o token pelo request
+     *
+     * @param httpServletRequest a requisição contendo o token
+     * @return o token, caso seja encontrado
+     */
+    public Long recuperarIdUsuario(HttpServletRequest httpServletRequest) {
+        Long result = null;
+        String token = recuperarToken(httpServletRequest);
+        if (validaToken(token)) {
+            result = getIdUsuario(token);
+        }
+        return result;
     }
 }

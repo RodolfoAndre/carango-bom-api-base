@@ -6,11 +6,10 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.util.List;
 
 public class GenericSpecification<T> implements Specification<T> {
 
-    private SearchCriteria criteria;
+    private transient SearchCriteria criteria;
 
     public GenericSpecification(SearchCriteria criteria) {
         super();
@@ -29,8 +28,7 @@ public class GenericSpecification<T> implements Specification<T> {
 
     @Override
     public Predicate toPredicate(Root<T> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
-        List<Object> arguments = criteria.getArguments();
-        Object arg = arguments.get(0);
+        Object arg = criteria.getArguments();
 
         switch (criteria.getSearchOperation()) {
             case EQUALITY:
@@ -40,7 +38,7 @@ public class GenericSpecification<T> implements Specification<T> {
             case LESS_THAN:
                 return criteriaBuilder.lessThan(root.get(criteria.getKey()), (Comparable) arg);
             case IN:
-                return root.get(criteria.getKey()).in(arguments);
+                return root.get(criteria.getKey()).in(arg);
             default:
                 return null;
         }

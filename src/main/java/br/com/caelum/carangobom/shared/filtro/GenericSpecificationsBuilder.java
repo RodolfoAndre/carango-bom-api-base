@@ -69,7 +69,7 @@ public class GenericSpecificationsBuilder<T> {
         if (!params.isEmpty()) {
             result = new GenericSpecification<>(params.get(0));
             for (var index = 1; index < params.size(); ++index) {
-                SearchCriteria searchCriteria = params.get(index);
+                var searchCriteria = params.get(index);
                 result = searchCriteria.isOrOperation() ? Specification.where(result).or(new GenericSpecification<>(searchCriteria))
                         : Specification.where(result).and(new GenericSpecification<>(searchCriteria));
             }

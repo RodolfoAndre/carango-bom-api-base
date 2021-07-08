@@ -1,5 +1,6 @@
 package br.com.caelum.carangobom.usuario;
 
+import br.com.caelum.carangobom.config.seguranca.TokenService;
 import br.com.caelum.carangobom.shared.estrutura.GenericController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -27,14 +29,17 @@ public class UsuarioController implements GenericController {
 
     private final UsuarioService usuarioService;
 
+    private final TokenService tokenService;
+
     /**
      * Construtor da classe Usuário Controller
      *
      * @param usuarioService o serviço de usuarios
      */
     @Autowired
-    public UsuarioController(UsuarioService usuarioService) {
+    public UsuarioController(UsuarioService usuarioService, TokenService tokenService) {
         this.usuarioService = usuarioService;
+        this.tokenService = tokenService;
     }
 
     /**
@@ -86,8 +91,8 @@ public class UsuarioController implements GenericController {
      */
     @PutMapping("/{id}")
     @ResponseBody
-    public ResponseEntity<UsuarioDto> alterarUsuario(@PathVariable Long id, @Valid @RequestBody UsuarioDto usuarioDto) {
-        return encapsulaResultadoOk(() -> usuarioService.alterarUsuario(id, usuarioDto));
+    public ResponseEntity<UsuarioDto> alterarUsuario(@PathVariable Long id, @Valid @RequestBody UsuarioDto usuarioDto, HttpServletRequest servletRequest) {
+        return encapsulaResultadoOk(() -> usuarioService.alterarUsuario(id, usuarioDto, tokenService.recuperarIdUsuario(servletRequest)));
     }
 
     /**
