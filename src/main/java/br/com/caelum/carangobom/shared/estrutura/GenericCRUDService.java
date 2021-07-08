@@ -74,7 +74,7 @@ public abstract class GenericCRUDService<T extends BasicEntity, S extends BasicE
      */
     @Transactional
     public S salvar(S dto) {
-        T entidade = mapper.converterParaEntidade(dto);
+        var entidade = mapper.converterParaEntidade(dto);
         return mapper.converterParaDto(repositorio.save(entidade));
     }
 

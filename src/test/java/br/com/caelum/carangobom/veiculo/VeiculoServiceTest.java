@@ -1,5 +1,6 @@
 package br.com.caelum.carangobom.veiculo;
 
+import br.com.caelum.carangobom.exception.MensagensExcecoes;
 import br.com.caelum.carangobom.exception.NotFoundException;
 import br.com.caelum.carangobom.marca.*;
 import br.com.caelum.carangobom.shared.filtro.SpecificationFactory;
@@ -29,9 +30,10 @@ import static org.mockito.MockitoAnnotations.openMocks;
 
 class VeiculoServiceTest {
 
-    public static final String ENTIDADE_NAO_ENCONTRADA_MENSAGEM = "Entidade não encontrada";
-    public static final String MARCA_NAO_ENCONTRADA_MENSAGEM = "Marca informada não encontrada";
-
+    public static final String FORD_MARCA_CONSTANTE = "Ford";
+    public static final String GM_MARCA_CONSTANTE = "GM";
+    public static final String KA_MODELO_CONSTANTE = "Ka";
+    public static final String CORSA_MODELO_CONSTANTE = "Corsa";
     @Mock
     private VeiculoRepository veiculoRepository;
 
@@ -54,13 +56,13 @@ class VeiculoServiceTest {
     @Test
     void deveListarTodasOsVeiculosCorretamente() {
         List<Marca> marcas = List.of(
-                new Marca(1L, "Ford"),
-                new Marca(2L, "GM")
+                new Marca(1L, FORD_MARCA_CONSTANTE),
+                new Marca(2L, GM_MARCA_CONSTANTE)
         );
 
         List<Veiculo> veiculos = List.of(
-                new Veiculo(1L, "KA", 2008, 15.000, marcas.get(0)),
-                new Veiculo(2L, "Corsa", 2008, 15.000, marcas.get(1))
+                new Veiculo(1L, KA_MODELO_CONSTANTE, 2008, 15.000, marcas.get(0)),
+                new Veiculo(2L, CORSA_MODELO_CONSTANTE, 2008, 15.000, marcas.get(1))
         );
 
         List<VeiculoDto> veiculosEsperados = veiculos.stream().map(veiculoDtoMapper::converterParaDto).collect(Collectors.toList());
@@ -76,7 +78,7 @@ class VeiculoServiceTest {
 
     @Test
     void deveRetornarListaVaziaSeNaoEncontrarNenhumVeiculo() {
-        List<Veiculo> veiculos = new ArrayList<Veiculo>();
+        List<VeiculoDto> veiculos = new ArrayList<>();
 
         doReturn(veiculos).when(veiculoRepository).findAllByOrderByModelo();
 
@@ -89,11 +91,11 @@ class VeiculoServiceTest {
     @Test
     void deveRetornarVeiculoPorIdCorretamente() {
         List<Marca> marcas = List.of(
-                new Marca(1L, "Ford")
+                new Marca(1L, FORD_MARCA_CONSTANTE)
         );
 
         Optional<Veiculo> veiculo = Optional.of(
-                new Veiculo(1L, "KA", 2008, 15.000, marcas.get(0))
+                new Veiculo(1L, KA_MODELO_CONSTANTE, 2008, 15.000, marcas.get(0))
         );
 
         var veiculoEsperado = veiculoDtoMapper.converterParaDto(veiculo.get());
@@ -117,17 +119,15 @@ class VeiculoServiceTest {
         Exception exception = assertThrows(NotFoundException.class, () -> {
             veiculoService.obterPorId(2L);
         });
-
-        String expectedMessage = ENTIDADE_NAO_ENCONTRADA_MENSAGEM;
         String actualMessage = exception.getMessage();
 
-        assertEquals(expectedMessage, actualMessage);
+        assertEquals(MensagensExcecoes.ENTIDADE_NAO_ENCONTRADO_MENSAGEM, actualMessage);
     }
 
     @Test
     void deveRetornarExcecaoNotFoundAoTentarCadastrarVeiculoEObterMarcaPorNomeNaoEncontrarMarca() {
         Optional<Marca> marcas = Optional.empty();
-        VeiculoDto veiculoDto = new VeiculoDto(null, "KA", 2008, 15.000, "Ford");
+        VeiculoDto veiculoDto = new VeiculoDto(null, KA_MODELO_CONSTANTE, 2008, 15.000, FORD_MARCA_CONSTANTE);
 
         when(marcaRepository.findByNome(veiculoDto.getMarca()))
                 .thenReturn(marcas);
@@ -138,16 +138,16 @@ class VeiculoServiceTest {
 
         String actualMessage = exception.getMessage();
 
-        assertEquals(MARCA_NAO_ENCONTRADA_MENSAGEM, actualMessage);
+        assertEquals(MensagensExcecoes.MARCA_NAO_ECONTRADA, actualMessage);
     }
 
     @Test
     void deveRetornarNovoVeiculoCadastrado() {
         Optional<Marca> marca = Optional.of(
-                new Marca(1L, "Ford")
+                new Marca(1L, FORD_MARCA_CONSTANTE)
         );
-        VeiculoDto veiculoDto = new VeiculoDto(null, "KA", 2008, 15.000, "Ford");
-        Veiculo novoVeiculo = new Veiculo(1L, "KA", 2008, 15.000, marca.get());
+        VeiculoDto veiculoDto = new VeiculoDto(null, KA_MODELO_CONSTANTE, 2008, 15.000, FORD_MARCA_CONSTANTE);
+        Veiculo novoVeiculo = new Veiculo(1L, KA_MODELO_CONSTANTE, 2008, 15.000, marca.get());
 
         when(marcaRepository.findByNome(veiculoDto.getMarca()))
                 .thenReturn(marca);
@@ -163,7 +163,7 @@ class VeiculoServiceTest {
     @Test
     void deveRetornarExcecaoNotFoundAoTentarEditarVeiculoEObterMarcaPorNomeNaoEncontrarMarca() {
         Optional<Marca> marcas = Optional.empty();
-        VeiculoDto veiculoDto = new VeiculoDto(1L, "KA", 2008, 15.000, "Ford");
+        VeiculoDto veiculoDto = new VeiculoDto(1L, KA_MODELO_CONSTANTE, 2008, 15.000, FORD_MARCA_CONSTANTE);
 
         when(marcaRepository.findByNome(veiculoDto.getMarca()))
                 .thenReturn(marcas);
@@ -174,19 +174,19 @@ class VeiculoServiceTest {
 
         String actualMessage = exception.getMessage();
 
-        assertEquals(MARCA_NAO_ENCONTRADA_MENSAGEM, actualMessage);
+        assertEquals(MensagensExcecoes.MARCA_NAO_ECONTRADA, actualMessage);
     }
 
     @Test
     void deveRetornarValorVeiculoAlteradoAoAlterarVeiculo() {
         Optional<Marca> marca = Optional.of(
-                new Marca(1L, "Ford")
+                new Marca(1L, FORD_MARCA_CONSTANTE)
         );
         Optional<Veiculo> veiculo = Optional.of(
-                new Veiculo(1L, "KA", 2008, 15.000, marca.get())
+                new Veiculo(1L, KA_MODELO_CONSTANTE, 2008, 15.000, marca.get())
         );
-        VeiculoDto veiculoDto = new VeiculoDto(1L, "KA", 2008, 17.800, "Ford");
-        Veiculo veiculoAlterado = new Veiculo(1L, "KA", 2008, 17.800, marca.get());
+        VeiculoDto veiculoDto = new VeiculoDto(1L, KA_MODELO_CONSTANTE, 2008, 17.800, FORD_MARCA_CONSTANTE);
+        Veiculo veiculoAlterado = new Veiculo(1L, KA_MODELO_CONSTANTE, 2008, 17.800, marca.get());
 
         when(marcaRepository.findByNome(veiculoDto.getMarca()))
                 .thenReturn(marca);
@@ -215,17 +215,17 @@ class VeiculoServiceTest {
 
         String actualMessage = exception.getMessage();
 
-        assertEquals(ENTIDADE_NAO_ENCONTRADA_MENSAGEM, actualMessage);
+        assertEquals(MensagensExcecoes.ENTIDADE_NAO_ENCONTRADO_MENSAGEM, actualMessage);
     }
 
     @Test
     void deveRetornarVeiculoExcluidoAoExcluirVeiculo() {
         List<Marca> marcas = List.of(
-                new Marca(1L, "Ford")
+                new Marca(1L, FORD_MARCA_CONSTANTE)
         );
 
         Optional<Veiculo> veiculos = Optional.of(
-                new Veiculo(1L, "KA", 2008, 15.000, marcas.get(0))
+                new Veiculo(1L, KA_MODELO_CONSTANTE, 2008, 15.000, marcas.get(0))
         );
 
         when(veiculoRepository.findById(1L))
@@ -239,13 +239,13 @@ class VeiculoServiceTest {
     @Test
     void deveRetornarVeiculosAoFiltrarVeiculos() {
         VeiculoFiltroDto filtroDto = new VeiculoFiltroDto();
-        filtroDto.setMarcas(Set.of("Ferrai", "Ford"));
-        filtroDto.setModelos(Set.of("488", "KA"));
+        filtroDto.setMarcas(Set.of("Ferrai", FORD_MARCA_CONSTANTE));
+        filtroDto.setModelos(Set.of("488", KA_MODELO_CONSTANTE));
         filtroDto.setPrecoMaximo(10000D);
         filtroDto.setPrecoMinimo(15000D);
 
-        Veiculo veiculo = new Veiculo(1L, "KA", 2020, 18000D);
-        veiculo.setMarca(new Marca("Ford"));
+        Veiculo veiculo = new Veiculo(1L, KA_MODELO_CONSTANTE, 2020, 18000D);
+        veiculo.setMarca(new Marca(FORD_MARCA_CONSTANTE));
         List<Veiculo> veiculos = Collections.singletonList(veiculo);
         when(veiculoRepository.findAll(any(Specification.class), any(Sort.class)))
                 .thenReturn(veiculos);
@@ -258,19 +258,19 @@ class VeiculoServiceTest {
     @Test
     void deveRetornarSumarioNaRecuperacaoDeDashboard() {
         VeiculoFiltroDto filtroDto = new VeiculoFiltroDto();
-        filtroDto.setMarcas(Set.of("Ferrai", "Ford"));
-        filtroDto.setModelos(Set.of("488", "KA"));
+        filtroDto.setMarcas(Set.of("Ferrai", FORD_MARCA_CONSTANTE));
+        filtroDto.setModelos(Set.of("488", KA_MODELO_CONSTANTE));
         filtroDto.setPrecoMaximo(10000D);
         filtroDto.setPrecoMinimo(15000D);
 
-        Veiculo veiculo0 = new Veiculo(1L, "KA", 2019, 18000D);
-        veiculo0.setMarca(new Marca("Ford"));
+        Veiculo veiculo0 = new Veiculo(1L, KA_MODELO_CONSTANTE, 2019, 18000D);
+        veiculo0.setMarca(new Marca(FORD_MARCA_CONSTANTE));
 
-        Veiculo veiculo1 = new Veiculo(1L, "KA", 2020, 22000D);
-        veiculo1.setMarca(new Marca("Ford"));
+        Veiculo veiculo1 = new Veiculo(1L, KA_MODELO_CONSTANTE, 2020, 22000D);
+        veiculo1.setMarca(new Marca(FORD_MARCA_CONSTANTE));
 
         Veiculo veiculo2 = new Veiculo(1L, "Fiesta", 2020, 50000D);
-        veiculo2.setMarca(new Marca("Ford"));
+        veiculo2.setMarca(new Marca(FORD_MARCA_CONSTANTE));
 
         List<Veiculo> veiculos = Arrays.asList(veiculo0, veiculo1, veiculo2);
         when(veiculoRepository.findAll()).thenReturn(veiculos);
@@ -280,12 +280,12 @@ class VeiculoServiceTest {
         Assertions.assertNotNull(dashboard);
         Assertions.assertFalse(CollectionUtils.isEmpty(dashboard));
         for (SumarioMarcaDto sumarioMarcaDto : dashboard) {
-            Assertions.assertEquals("Ford", sumarioMarcaDto.getMarca());
+            Assertions.assertEquals(FORD_MARCA_CONSTANTE, sumarioMarcaDto.getMarca());
             Assertions.assertEquals(90000, sumarioMarcaDto.getValorTotal());
             Assertions.assertEquals(3, sumarioMarcaDto.getNumeroDeVeiculos());
 
             for (SumarioModeloDto modelo : sumarioMarcaDto.getModelos()) {
-                if (modelo.getModelo().equals("KA")){
+                if (modelo.getModelo().equals(KA_MODELO_CONSTANTE)){
                     Assertions.assertEquals(2, modelo.getNumeroDeVeiculos());
                     Assertions.assertEquals(40000, modelo.getValorTotal());
                 } else if (modelo.getModelo().equals("Fiesta")) {

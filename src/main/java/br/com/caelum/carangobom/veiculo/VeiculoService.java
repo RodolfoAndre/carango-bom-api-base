@@ -1,5 +1,6 @@
 package br.com.caelum.carangobom.veiculo;
 
+import br.com.caelum.carangobom.exception.MensagensExcecoes;
 import br.com.caelum.carangobom.exception.NotFoundException;
 import br.com.caelum.carangobom.marca.Marca;
 import br.com.caelum.carangobom.marca.MarcaRepository;
@@ -26,13 +27,21 @@ import java.util.stream.Collectors;
 @Service
 public class VeiculoService extends GenericCRUDService<Veiculo, VeiculoDto> {
 
-    private VeiculoRepository veiculoRepository;
+    private static final String MARCA_KEY = "marca";
 
-    private MarcaRepository marcaRepository;
+    private static final String MODELO_KEY = "modelo";
 
-    private VeiculoDtoMapper veiculoDtoMapper;
+    private static final String VALOR_KEY = "valor";
 
-    private SpecificationFactory<Veiculo> veiculoSpecificationFactory;
+    private static final String ID_KEY = "id";
+
+    private final VeiculoRepository veiculoRepository;
+
+    private final MarcaRepository marcaRepository;
+
+    private final VeiculoDtoMapper veiculoDtoMapper;
+
+    private final SpecificationFactory<Veiculo> veiculoSpecificationFactory;
 
     /**
      * Construtor de veículo service
@@ -93,7 +102,7 @@ public class VeiculoService extends GenericCRUDService<Veiculo, VeiculoDto> {
      */
     private Marca obterMarca(String nomeMarca) {
         Optional<Marca> marcaEncontrada = marcaRepository.findByNome(nomeMarca);
-        return marcaEncontrada.orElseThrow(() -> new NotFoundException("Marca informada não encontrada"));
+        return marcaEncontrada.orElseThrow(() -> new NotFoundException(MensagensExcecoes.MARCA_NAO_ECONTRADA));
     }
 
     /**
@@ -106,22 +115,22 @@ public class VeiculoService extends GenericCRUDService<Veiculo, VeiculoDto> {
 
         if (!CollectionUtils.isEmpty(filtroDto.getMarcas())) {
             List<Marca> marcas = marcaRepository.findAllByNomeIn(filtroDto.getMarcas());
-            genericSpecificationsBuilder.with(veiculoSpecificationFactory.in("marca", marcas));
+            genericSpecificationsBuilder.with(veiculoSpecificationFactory.in(MARCA_KEY, marcas));
         }
 
         if (!CollectionUtils.isEmpty(filtroDto.getModelos())) {
-            genericSpecificationsBuilder.with(veiculoSpecificationFactory.in("modelo", filtroDto.getModelos()));
+            genericSpecificationsBuilder.with(veiculoSpecificationFactory.in(MODELO_KEY, filtroDto.getModelos()));
         }
 
         if (Objects.nonNull(filtroDto.getPrecoMinimo())) {
-            genericSpecificationsBuilder.with(veiculoSpecificationFactory.isGreaterThan("valor", filtroDto.getPrecoMinimo()));
+            genericSpecificationsBuilder.with(veiculoSpecificationFactory.isGreaterThan(VALOR_KEY, filtroDto.getPrecoMinimo()));
         }
 
         if (Objects.nonNull(filtroDto.getPrecoMaximo())) {
-            genericSpecificationsBuilder.with(veiculoSpecificationFactory.isLessThan("valor", filtroDto.getPrecoMaximo()));
+            genericSpecificationsBuilder.with(veiculoSpecificationFactory.isLessThan(VALOR_KEY, filtroDto.getPrecoMaximo()));
         }
 
-        List<Veiculo> veiculos = veiculoRepository.findAll(genericSpecificationsBuilder.build(), Sort.by(Sort.Direction.ASC, "id"));
+        List<Veiculo> veiculos = veiculoRepository.findAll(genericSpecificationsBuilder.build(), Sort.by(Sort.Direction.ASC, ID_KEY));
         return veiculos.stream().map(veiculoDtoMapper::converterParaDto).collect(Collectors.toList());
     }
 

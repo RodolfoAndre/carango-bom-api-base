@@ -34,7 +34,7 @@ public class MarcaDto extends BasicEntityDto {
         if (that == null || getClass() != that.getClass()) {
             return false;
         }
-        MarcaDto marcaDto = (MarcaDto) that;
+        var marcaDto = (MarcaDto) that;
         return Objects.equals(nome, marcaDto.nome);
     }
 

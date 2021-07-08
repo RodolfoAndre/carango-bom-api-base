@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+
 import java.util.List;
 
 @Data
@@ -18,6 +19,6 @@ public class SearchCriteria {
     private List<Object> arguments;
 
     public enum SearchOperation {
-        EQUALITY, GREATER_THAN, LESS_THAN, LIKE, IN
+        EQUALITY, GREATER_THAN, LESS_THAN, IN
     }
 }
