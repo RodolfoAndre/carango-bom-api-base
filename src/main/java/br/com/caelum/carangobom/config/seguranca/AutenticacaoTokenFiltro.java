@@ -30,7 +30,7 @@ public class AutenticacaoTokenFiltro extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
-        var token = recuperarToken(httpServletRequest);
+        var token = tokenService.recuperarToken(httpServletRequest);
         var valido = tokenService.validaToken(token);
         if (valido) {
             autenticarCliente(token);
@@ -49,20 +49,5 @@ public class AutenticacaoTokenFiltro extends OncePerRequestFilter {
         var usuario = usuarioOptional.orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
         var authenticationToken = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-    }
-
-    /**
-     * Recupera o token pelo request
-     *
-     * @param httpServletRequest a requisição contendo o token
-     * @return o token, caso seja encontrado
-     */
-    private String recuperarToken(HttpServletRequest httpServletRequest) {
-        String result = null;
-        var token = httpServletRequest.getHeader("Authorization");
-        if (!token.isBlank() && token.startsWith("Bearer ")) {
-            result = token.substring(7);
-        }
-        return result;
     }
 }

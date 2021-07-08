@@ -1,6 +1,8 @@
 package br.com.caelum.carangobom.usuario;
 
 import br.com.caelum.carangobom.exception.ConflictException;
+import br.com.caelum.carangobom.exception.MensagensExcecoes;
+import br.com.caelum.carangobom.exception.NotAllowedException;
 import br.com.caelum.carangobom.shared.estrutura.GenericCRUDService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,7 +17,7 @@ import java.util.Optional;
 @Service
 public class UsuarioService extends GenericCRUDService<Usuario, UsuarioDto> {
 
-    private UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
 
     /**
      * Construtor de usuário service
@@ -48,14 +50,19 @@ public class UsuarioService extends GenericCRUDService<Usuario, UsuarioDto> {
      *
      * @param id o id da usuaria a ser alterada
      * @param usuarioDto os novos valores da usuario
+     * @param idUsuario o id do usuário que requisitou a mudança
      * @return a usuario alterada no banco de dados
      */
     @Transactional
-    public UsuarioDto alterarUsuario(Long id, UsuarioDto usuarioDto) {
-        var usuarioEncontrado = obterPorId(id);
-        String senhaEncriptada = new BCryptPasswordEncoder().encode(usuarioDto.getSenha());
-        usuarioEncontrado.setSenha(senhaEncriptada);
-        return salvar(usuarioEncontrado);
+    public UsuarioDto alterarUsuario(Long id, UsuarioDto usuarioDto, Long idUsuario) {
+        if (id.equals(idUsuario)) {
+            var usuarioEncontrado = obterPorId(id);
+            String senhaEncriptada = new BCryptPasswordEncoder().encode(usuarioDto.getSenha());
+            usuarioEncontrado.setSenha(senhaEncriptada);
+            return salvar(usuarioEncontrado);
+        } else {
+            throw new NotAllowedException(MensagensExcecoes.TROCAR_SENHA_DE_OUTRO_USUARIO_MENSAGEM);
+        }
     }
 
     /**
@@ -65,6 +72,6 @@ public class UsuarioService extends GenericCRUDService<Usuario, UsuarioDto> {
      */
     private void validarUsuarioExistente(String nomeUsuario) {
         Optional<Usuario> usuarioEncontrada = usuarioRepository.findByNome(nomeUsuario);
-        usuarioEncontrada.ifPresent(m ->{ throw new ConflictException("Usuario " + m.getNome()+ " já existente");});
+        usuarioEncontrada.ifPresent(m ->{ throw new ConflictException(String.format(MensagensExcecoes.ENTIDADE_EXISTENTE_FORMATO_MENSAGEM, Usuario.class.getSimpleName(), m.getNome()));});
     }
 }

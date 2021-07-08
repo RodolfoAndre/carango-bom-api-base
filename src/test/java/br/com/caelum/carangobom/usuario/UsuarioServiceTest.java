@@ -1,6 +1,8 @@
 package br.com.caelum.carangobom.usuario;
 
 import br.com.caelum.carangobom.exception.ConflictException;
+import br.com.caelum.carangobom.exception.MensagensExcecoes;
+import br.com.caelum.carangobom.exception.NotAllowedException;
 import br.com.caelum.carangobom.exception.NotFoundException;
 import br.com.caelum.carangobom.marca.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,8 +23,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 
 class UsuarioServiceTest {
 
-    public static final String ENTIDADE_NAO_ENCONTRADA_MENSAGEM = "Entidade não encontrada";
-
+    public static final String MARIA_STRING_CONSTANT = "Maria";
     @Mock
     private UsuarioRepository usuarioRepository;
 
@@ -44,7 +45,7 @@ class UsuarioServiceTest {
 
         Usuario usuarioMaria = new Usuario();
         usuarioMaria.setId(1L);
-        usuarioMaria.setNome("Maria");
+        usuarioMaria.setNome(MARIA_STRING_CONSTANT);
         usuarioMaria.setSenha("senhamaria");
 
         Usuario usuarioJoao = new Usuario();
@@ -81,7 +82,7 @@ class UsuarioServiceTest {
     void deveRetornarUsuarioPorIdCorretamente() {
         Usuario usuario = new Usuario();
         usuario.setId(1L);
-        usuario.setNome("Maria");
+        usuario.setNome(MARIA_STRING_CONSTANT);
         usuario.setSenha("senhausuario");
 
         Optional<Usuario> usuarioMaria = Optional.of(usuario);
@@ -110,16 +111,16 @@ class UsuarioServiceTest {
 
         String actualMessage = exception.getMessage();
 
-        assertEquals(ENTIDADE_NAO_ENCONTRADA_MENSAGEM, actualMessage);
+        assertEquals(MensagensExcecoes.ENTIDADE_NAO_ENCONTRADO_MENSAGEM, actualMessage);
     }
 
     @Test
     void deveRetornarExcecaoCasoUsuarioJaEstiverCadastradaAoTentarInserir() {
-        UsuarioDto usuarioDto = new UsuarioDto(null, "Maria", "senha123");
+        UsuarioDto usuarioDto = new UsuarioDto(null, MARIA_STRING_CONSTANT, "senha123");
 
         Usuario usuario = new Usuario();
         usuario.setId(1L);
-        usuario.setNome("Maria");
+        usuario.setNome(MARIA_STRING_CONSTANT);
         usuario.setSenha("senhausuario");
 
         Optional<Usuario> usuarioCadastrado = Optional.of(usuario);
@@ -139,10 +140,10 @@ class UsuarioServiceTest {
 
     @Test
     void deveRetornarNovoUsuarioCadastrado() {
-        UsuarioDto usuarioDto = new UsuarioDto(null, "Maria", "senhausuario");
+        UsuarioDto usuarioDto = new UsuarioDto(null, MARIA_STRING_CONSTANT, "senhausuario");
         Usuario novoUsuario = new Usuario();
         novoUsuario.setId(1L);
-        novoUsuario.setNome("Maria");
+        novoUsuario.setNome(MARIA_STRING_CONSTANT);
         novoUsuario.setSenha("senhausuario");
 
         when(usuarioRepository.findByNome(usuarioDto.getNome()))
@@ -159,33 +160,50 @@ class UsuarioServiceTest {
     @Test
     void deveRetornarExcecaoNotFoundCasoUsuarioPorIdNaoEncontrarUsuarioAoEditar() {
         Optional<Usuario> usuario = Optional.empty();
-        UsuarioDto usuarioDto = new UsuarioDto(1L, "Maria");
+        UsuarioDto usuarioDto = new UsuarioDto(1L, MARIA_STRING_CONSTANT);
 
         when(usuarioRepository.findById(2L))
                 .thenReturn(usuario);
 
         Exception exception = assertThrows(NotFoundException.class, () -> {
-            usuarioService.alterarUsuario(2L, usuarioDto);
+            usuarioService.alterarUsuario(1L, usuarioDto, 1L);
         });
 
         String actualMessage = exception.getMessage();
 
-        assertEquals(ENTIDADE_NAO_ENCONTRADA_MENSAGEM, actualMessage);
+        assertEquals(MensagensExcecoes.ENTIDADE_NAO_ENCONTRADO_MENSAGEM, actualMessage);
+    }
+
+    @Test
+    void deveRetornarExcecaoNotAllowrdCasoUsuarioPorIdNaoSejaOUsuarioLogado() {
+        Optional<Usuario> usuario = Optional.empty();
+        UsuarioDto usuarioDto = new UsuarioDto(1L, MARIA_STRING_CONSTANT);
+
+        when(usuarioRepository.findById(2L))
+                .thenReturn(usuario);
+
+        Exception exception = assertThrows(NotAllowedException.class, () -> {
+            usuarioService.alterarUsuario(1L, usuarioDto, 2L);
+        });
+
+        String actualMessage = exception.getMessage();
+
+        assertEquals(MensagensExcecoes.TROCAR_SENHA_DE_OUTRO_USUARIO_MENSAGEM, actualMessage);
     }
 
     @Test
     void deveRetornarUsuarioAlteradoAoAlterarSenhaUsuario() {
-        UsuarioDto usuarioDto = new UsuarioDto(1L, "Maria", "senha123alterada");
+        UsuarioDto usuarioDto = new UsuarioDto(1L, MARIA_STRING_CONSTANT, "senha123alterada");
 
         Usuario usuario = new Usuario();
         usuario.setId(1L);
-        usuario.setNome("Maria");
+        usuario.setNome(MARIA_STRING_CONSTANT);
         usuario.setSenha("senha123");
         Optional<Usuario> usuarioRegistrado = Optional.of(usuario);
 
         Usuario usuarioSalvo = new Usuario();
         usuarioSalvo.setId(1L);
-        usuarioSalvo.setNome("Maria");
+        usuarioSalvo.setNome(MARIA_STRING_CONSTANT);
         usuarioSalvo.setSenha("senha123alterada");
 
         when(usuarioRepository.findById(1L))
@@ -194,7 +212,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.save(any(Usuario.class)))
                 .thenReturn(usuarioSalvo);
 
-        var usuarioAlterado = usuarioService.alterarUsuario(1L, usuarioDto);
+        var usuarioAlterado = usuarioService.alterarUsuario(1L, usuarioDto, 1L);
 
         assertNull( usuarioAlterado.getSenha());
         Mockito.verify(usuarioRepository, Mockito.times(1)).save(any());
@@ -213,14 +231,14 @@ class UsuarioServiceTest {
 
         String actualMessage = exception.getMessage();
 
-        assertEquals(ENTIDADE_NAO_ENCONTRADA_MENSAGEM, actualMessage);
+        assertEquals(MensagensExcecoes.ENTIDADE_NAO_ENCONTRADO_MENSAGEM, actualMessage);
     }
 
     @Test
     void deveRetornarUsuarioExcluidoAoExcluirUsuario() {
         Usuario usuario = new Usuario();
         usuario.setId(1L);
-        usuario.setNome("Maria");
+        usuario.setNome(MARIA_STRING_CONSTANT);
         Optional<Usuario> usuarioExcluido = Optional.of(usuario);
 
         when(usuarioRepository.findById(1L))
