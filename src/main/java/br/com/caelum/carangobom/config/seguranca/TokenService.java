@@ -60,7 +60,8 @@ public class TokenService {
         var dadosLogin = new UsernamePasswordAuthenticationToken(usuarioDto.getNome(), usuarioDto.getSenha());
         var authentication = authenticationManager.authenticate(dadosLogin);
         String token = gerarToken(authentication);
-        return new AutenticacaoTokenDto(token, "Bearer");
+        var idUsuario = getIdUsuario(token);
+        return new AutenticacaoTokenDto(idUsuario, token, "Bearer");
     }
 
     /**

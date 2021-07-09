@@ -43,7 +43,7 @@ class TokenServiceTest {
 
     @Test
     void deveRetornarFalseQuandoOTokenForInvalido() {
-        AutenticacaoTokenDto tokenDto = new AutenticacaoTokenDto("", "Bearer");
+        AutenticacaoTokenDto tokenDto = new AutenticacaoTokenDto(1L,"", "Bearer");
         Assertions.assertFalse(tokenService.validaToken(tokenDto.getToken()));
     }
 

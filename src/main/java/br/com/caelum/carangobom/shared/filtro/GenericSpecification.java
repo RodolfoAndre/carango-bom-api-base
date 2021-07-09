@@ -28,7 +28,7 @@ public class GenericSpecification<T> implements Specification<T> {
 
     @Override
     public Predicate toPredicate(Root<T> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
-        Object arg = criteria.getArguments();
+        Object arg = criteria.getArguments().get(0);
 
         switch (criteria.getSearchOperation()) {
             case EQUALITY:

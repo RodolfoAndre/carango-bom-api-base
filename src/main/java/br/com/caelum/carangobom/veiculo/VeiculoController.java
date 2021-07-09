@@ -101,7 +101,7 @@ public class VeiculoController implements GenericController {
      * @return {@link ResponseEntity} com o resultado da requisição. Caso ocorra tudo como esperado, deverá retornar
      * com "status code" 200 (ok).
      */
-    @GetMapping("/filtro")
+    @PostMapping("/filtro")
     @ResponseBody
     public ResponseEntity<List<VeiculoDto>> filtrarVeiculos(@RequestBody VeiculoFiltroDto filtroDto) {
         return encapsulaResultadoOk(() -> veiculoService.filtrarVeiculos(filtroDto));
