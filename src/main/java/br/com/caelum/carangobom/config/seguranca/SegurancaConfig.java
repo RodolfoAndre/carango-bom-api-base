@@ -16,6 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -59,7 +60,7 @@ public class SegurancaConfig extends WebSecurityConfigurerAdapter {
 			.antMatchers(HttpMethod.POST, "/usuarios").permitAll()
 			.antMatchers(HttpMethod.GET, "/veiculos").permitAll()
 			.anyRequest().authenticated().and()
-				.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+				.csrf().csrfTokenRepository(getCsrfTokenRepository()).and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 				.addFilterBefore(new AutenticacaoTokenFiltro(tokenService, usuarioRepository), UsernamePasswordAuthenticationFilter.class);
 	}
 	
@@ -81,5 +82,12 @@ public class SegurancaConfig extends WebSecurityConfigurerAdapter {
 		var source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);
 		return source;
+	}
+
+	private CsrfTokenRepository getCsrfTokenRepository() {
+		var tokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+		tokenRepository.setCookiePath("/");
+		tokenRepository.setCookieDomain("https://carango-bom-withfliters-ui.herokuapp.com");
+		return tokenRepository;
 	}
 }
