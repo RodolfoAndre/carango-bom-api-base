@@ -2,6 +2,8 @@ package br.com.caelum.carangobom.marca;
 
 import br.com.caelum.carangobom.shared.estrutura.GenericController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +41,7 @@ public class MarcaController implements GenericController {
      */
     @GetMapping
     @ResponseBody
+    @Cacheable(value ="listarMarcas")
     public ResponseEntity<List<MarcaDto>> listarMarcas() {
         return encapsulaResultadoOk(marcaService::listar);
     }
@@ -66,6 +69,7 @@ public class MarcaController implements GenericController {
      */
     @PostMapping
     @ResponseBody
+    @CacheEvict(value ="listarMarcas", allEntries = true)
     public ResponseEntity<MarcaDto> cadastrarMarca(@Valid @RequestBody MarcaDto marcaDto, UriComponentsBuilder uriBuilder) {
         return encapsularResultadoCreated(() -> marcaService.cadastrarMarca(marcaDto), uriBuilder, "/marcas/{id}");
     }
@@ -80,6 +84,7 @@ public class MarcaController implements GenericController {
      */
     @PutMapping("/{id}")
     @ResponseBody
+    @CacheEvict(value ="listarMarcas", allEntries = true)
     public ResponseEntity<MarcaDto> alterarMarca(@PathVariable Long id, @Valid @RequestBody MarcaDto marcaDto) {
         return encapsulaResultadoOk(() -> marcaService.alterarMarca(id, marcaDto));
     }
@@ -94,6 +99,7 @@ public class MarcaController implements GenericController {
     @DeleteMapping("/{id}")
     @ResponseBody
     @Transactional
+    @CacheEvict(value ="listarMarcas", allEntries = true)
     public ResponseEntity<MarcaDto> deletarMarca(@PathVariable Long id) {
         return encapsulaResultadoOk(() -> marcaService.deletar(id));
     }
