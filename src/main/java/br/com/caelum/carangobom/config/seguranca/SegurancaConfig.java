@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -58,7 +59,7 @@ public class SegurancaConfig extends WebSecurityConfigurerAdapter {
 			.antMatchers(HttpMethod.POST, "/usuarios").permitAll()
 			.antMatchers(HttpMethod.GET, "/veiculos").permitAll()
 			.anyRequest().authenticated().and()
-				.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+				.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 				.addFilterBefore(new AutenticacaoTokenFiltro(tokenService, usuarioRepository), UsernamePasswordAuthenticationFilter.class);
 	}
 	
@@ -73,7 +74,7 @@ public class SegurancaConfig extends WebSecurityConfigurerAdapter {
 	CorsConfigurationSource corsConfigurationSource()
 	{
 		var configuration = new CorsConfiguration();
-		configuration.addAllowedOrigin("http://localhost:3000");
+		configuration.addAllowedOrigin("https://carango-bom-withfliters-ui.herokuapp.com");
 		configuration.addAllowedHeader("*");
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
 		var source = new UrlBasedCorsConfigurationSource();
