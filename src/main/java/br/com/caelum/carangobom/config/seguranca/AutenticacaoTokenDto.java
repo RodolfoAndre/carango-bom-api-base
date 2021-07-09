@@ -9,6 +9,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class AutenticacaoTokenDto {
 
+    private Long idUsuario;
+
     private String token;
 
     private String tipo;
