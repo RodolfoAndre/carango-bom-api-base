@@ -32,10 +32,12 @@ class AutenticacaoControllerTest {
     @Test
     void deveAutenticarUsuarioEhRetornarToken() {
         AutenticacaoTokenDto autenticacaoTokenDto = new AutenticacaoTokenDto(
+                    1L,
                     "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJDYXJhbmdvIEJvbSIsInN1YiI6IjEiLCJpYXQiOjE2MjU2NzcxNTMsImV4cCI6MTYyNTY3ODk1M30._mrPB9JPFVl4FdxkzBt9QIGot4jIQ_96HmLa9ZteM8I",
                     "Bearer");
 
         UsuarioDto usuarioDto = new UsuarioDto();
+        usuarioDto.setId(1L);
         usuarioDto.setNome("Maria");
         usuarioDto.setSenha("senha123");
 
