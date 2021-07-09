@@ -74,7 +74,7 @@ public class SegurancaConfig extends WebSecurityConfigurerAdapter {
 	CorsConfigurationSource corsConfigurationSource()
 	{
 		var configuration = new CorsConfiguration();
-		configuration.addAllowedOrigin("http://carango-bom-withfliters-ui.herokuapp.com/");
+		configuration.addAllowedOrigin("https://carango-bom-withfliters-ui.herokuapp.com");
 		configuration.addAllowedHeader("*");
 		configuration.setAllowCredentials(true);
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
