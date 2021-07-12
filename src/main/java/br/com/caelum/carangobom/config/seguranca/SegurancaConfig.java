@@ -22,6 +22,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 @EnableWebSecurity
 @Configuration
@@ -76,6 +77,7 @@ public class SegurancaConfig extends WebSecurityConfigurerAdapter {
 		var configuration = new CorsConfiguration();
 		configuration.addAllowedOrigin("https://carango-bom-withfliters-ui.herokuapp.com");
 		configuration.addAllowedHeader("*");
+		configuration.setAllowedOrigins(Collections.singletonList("no-cors"));
 		configuration.setAllowCredentials(true);
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
 		var source = new UrlBasedCorsConfigurationSource();
