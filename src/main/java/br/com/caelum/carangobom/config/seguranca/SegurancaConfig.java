@@ -72,8 +72,7 @@ public class SegurancaConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	@Bean
-	CorsConfigurationSource corsConfigurationSource()
-	{
+	CorsConfigurationSource corsConfigurationSource() {
 		var configuration = new CorsConfiguration();
 		configuration.addAllowedOrigin("https://carango-bom-withfliters-ui.herokuapp.com");
 		configuration.addAllowedHeader("*");
@@ -86,8 +85,6 @@ public class SegurancaConfig extends WebSecurityConfigurerAdapter {
 
 	private CsrfTokenRepository getCsrfTokenRepository() {
 		var tokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
-		tokenRepository.setCookiePath("/");
-		tokenRepository.setCookieDomain("https://carango-bom-withfliters-ui.herokuapp.com");
 		return tokenRepository;
 	}
 }
