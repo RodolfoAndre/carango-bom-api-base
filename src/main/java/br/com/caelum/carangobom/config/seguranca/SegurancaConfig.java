@@ -85,6 +85,7 @@ public class SegurancaConfig extends WebSecurityConfigurerAdapter {
 
 	private CsrfTokenRepository getCsrfTokenRepository() {
 		var tokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+		tokenRepository.setCookieDomain("https://carango-bom-withfliters-ui.herokuapp.com");
 		return tokenRepository;
 	}
 }
